@@ -1,0 +1,13 @@
+{
+  "name": "gnome-shell-spotlight",
+  "version": "1.0.0",
+  "description": "A customizable GNOME Shell extension with 13 shader effects",
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0"
+  }
+}
