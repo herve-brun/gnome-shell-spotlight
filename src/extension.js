@@ -5,6 +5,30 @@ const Main = imports.misc.extensionUtils.getCurrentExtension();
 const DEV_MODE = false;
 const falloffFactor = 0.81;
 
+// === EASING FUNCTIONS ===
+const easingFunctions = {
+    linear: t => t,
+    'ease-in-quad': t => t * t,
+    'ease-out-quad': t => t * (2 - t),
+    'ease-in-out-quad': t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    'ease-in-cubic': t => t * t * t,
+    'ease-out-cubic': t => (--t) * t * t + 1,
+    'ease-in-out-cubic': t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+    'ease-in-elastic': t => {
+        const c4 = (2 * Math.PI) / 3;
+        return t === 0 ? 0 : t === 1 ? 1 : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
+    },
+    'ease-out-elastic': t => {
+        const c4 = (2 * Math.PI) / 3;
+        return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+    },
+};
+
+function applyEasing(t, easingName) {
+    const easing = easingFunctions[easingName] || easingFunctions.linear;
+    return easing(t);
+}
+
 // === SHADER REGISTRY ===
 const vertexShaderSrc = `
     attribute vec2 a_position;
@@ -562,6 +586,12 @@ let heatData = null;
 let time = 0;
 let timeHandlerId = null;
 let heatmapHandlerId = null;
+let fadeOutId = null;
+let fadeInId = null;
+let isFadingIn = false;
+let isFadingOut = false;
+let fadeStartTime = 0;
+let fadeDuration = 0;
 
 // === SETTINGS ===
 const settings = new Gio.Settings({
@@ -670,7 +700,6 @@ function updateShaderUniforms() {
     ];
     const color = settings.get_value('color').deep_unpack();
     const radius = settings.get_double('radius');
-    const opacity = settings.get_double('opacity');
 
     currentShaderEffect.set_uniform_value('u_resolution_inv', resolutionInv);
     currentShaderEffect.set_uniform_value('u_mouse', normalizedMouse);
@@ -755,8 +784,6 @@ function updateShaderUniforms() {
             currentShaderEffect.set_uniform_value('u_cold_color', settings.get_value('heatmap-cold-color').deep_unpack());
             break;
     }
-
-    spotlight.opacity = opacity * 255;
 }
 
 function startTimeAnimation() {
@@ -772,6 +799,69 @@ function startTimeAnimation() {
         }
         return GLib.SOURCE_CONTINUE;
     });
+}
+
+// === FADE ANIMATION WITH EASING ===
+function startFadeOut() {
+    if (fadeOutId) GLib.source_remove(fadeOutId);
+    if (fadeInId) GLib.source_remove(fadeInId);
+    isFadingIn = false;
+    isFadingOut = true;
+    fadeStartTime = Date.now();
+    fadeDuration = settings.get_int('fade-delay');
+
+    const easing = settings.get_string('fade-easing');
+
+    fadeOutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+        const elapsed = Date.now() - fadeStartTime;
+        const progress = Math.min(elapsed / fadeDuration, 1.0);
+        const easedProgress = applyEasing(progress, easing);
+        spotlight.opacity = 255 * (1 - easedProgress);
+
+        if (progress >= 1.0) {
+            isFadingOut = false;
+            return GLib.SOURCE_REMOVE;
+        }
+        return GLib.SOURCE_CONTINUE;
+    });
+}
+
+function startFadeIn() {
+    if (fadeInId) GLib.source_remove(fadeInId);
+    if (fadeOutId) GLib.source_remove(fadeOutId);
+    isFadingIn = true;
+    isFadingOut = false;
+    fadeStartTime = Date.now();
+    fadeDuration = settings.get_int('fade-delay');
+
+    const easing = settings.get_string('fade-easing');
+
+    fadeInId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+        const elapsed = Date.now() - fadeStartTime;
+        const progress = Math.min(elapsed / fadeDuration, 1.0);
+        const easedProgress = applyEasing(progress, easing);
+        const targetOpacity = settings.get_double('opacity');
+        spotlight.opacity = 255 * targetOpacity * easedProgress;
+
+        if (progress >= 1.0) {
+            isFadingIn = false;
+            return GLib.SOURCE_REMOVE;
+        }
+        return GLib.SOURCE_CONTINUE;
+    });
+}
+
+function resetFadeTimers() {
+    if (fadeOutId) {
+        GLib.source_remove(fadeOutId);
+        fadeOutId = null;
+    }
+    if (fadeInId) {
+        GLib.source_remove(fadeInId);
+        fadeInId = null;
+    }
+    isFadingIn = false;
+    isFadingOut = false;
 }
 
 // Dev-only: Reload shaders
@@ -806,25 +896,28 @@ function enable() {
     startTimeAnimation();
 
     const motionHandlerId = global.stage.connect('motion-event', () => {
-        updateShaderUniforms();
+        if (!isFadingIn) {
+            resetFadeTimers();
+            spotlight.opacity = 255 * settings.get_double('opacity');
+            startFadeOut();
+        }
     });
 
-    const fadeDelay = settings.get_int('fade-delay');
-    const fadeOutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, fadeDelay, () => {
-        spotlight.opacity = 0;
-        return GLib.SOURCE_CONTINUE;
-    });
+    // Start initial fade-in
+    startFadeIn();
 
     settings.connect('changed::shader-type', applyShaderEffect);
     settings.connect('changed::radius', updateShaderUniforms);
     settings.connect('changed::color', updateShaderUniforms);
     settings.connect('changed::opacity', updateShaderUniforms);
     settings.connect('changed::fade-delay', () => {
-        if (fadeOutId) GLib.source_remove(fadeOutId);
-        fadeOutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, settings.get_int('fade-delay'), () => {
-            spotlight.opacity = 0;
-            return GLib.SOURCE_CONTINUE;
-        });
+        resetFadeTimers();
+        startFadeOut();
+    });
+    settings.connect('changed::fade-easing', () => {
+        resetFadeTimers();
+        if (isFadingOut) startFadeOut();
+        else if (isFadingIn) startFadeIn();
     });
     settings.connect('changed::ripple-speed', startTimeAnimation);
     settings.connect('changed::ripple-frequency', updateShaderUniforms);
@@ -852,9 +945,11 @@ function enable() {
     settings.connect('changed::brightness', updateShaderUniforms);
     settings.connect('changed::grid-size', updateShaderUniforms);
     settings.connect('changed::grid-thickness', updateShaderUniforms);
+    settings.connect('changed::grid-color', updateShaderUniforms);
     settings.connect('changed::grid-snap-to-mouse', updateShaderUniforms);
     settings.connect('changed::neon-glow-strength', updateShaderUniforms);
     settings.connect('changed::neon-pulse-speed', updateShaderUniforms);
+    settings.connect('changed::neon-color', updateShaderUniforms);
     settings.connect('changed::neon-bloom-radius', updateShaderUniforms);
     settings.connect('changed::heatmap-hot-color', updateShaderUniforms);
     settings.connect('changed::heatmap-cold-color', updateShaderUniforms);
@@ -863,14 +958,6 @@ function enable() {
 }
 
 function disable() {
-    if (spotlight) {
-        global.stage.remove_actor(spotlight);
-        spotlight = null;
-    }
-    if (currentShaderEffect) {
-        spotlight?.remove_effect(currentShaderEffect);
-        currentShaderEffect = null;
-    }
     if (timeHandlerId) {
         GLib.source_remove(timeHandlerId);
         timeHandlerId = null;
@@ -879,5 +966,17 @@ function disable() {
         GLib.source_remove(heatmapHandlerId);
         heatmapHandlerId = null;
     }
+    resetFadeTimers();
+
+    if (spotlight) {
+        global.stage.remove_actor(spotlight);
+        spotlight = null;
+    }
+
+    currentShaderEffect = null;
     currentShaderName = null;
+}
+
+function init() {
+    // Nothing to do here
 }
