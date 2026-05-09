@@ -6,7 +6,7 @@
       <default>'spotlight'</default>
       <summary>Shader effect type</summary>
       <description>Choose the shader effect.</description>
-      <range>
+      <choices>
         <choice value="spotlight"/>
         <choice value="ripple"/>
         <choice value="scanline"/>
@@ -20,7 +20,7 @@
         <choice value="grid"/>
         <choice value="neon"/>
         <choice value="heatmap"/>
-      </range>
+      </choices>
     </key>
 
     <!-- Common settings -->
@@ -51,7 +51,7 @@
       <default>'ease-out-quad'</default>
       <summary>Easing function</summary>
       <description>Easing function for animations.</description>
-      <range>
+      <choices>
         <choice value="linear"/>
         <choice value="ease-in-quad"/>
         <choice value="ease-out-quad"/>
@@ -61,7 +61,7 @@
         <choice value="ease-in-out-cubic"/>
         <choice value="ease-in-elastic"/>
         <choice value="ease-out-elastic"/>
-      </range>
+      </choices>
     </key>
 
     <!-- Spotlight -->
@@ -189,10 +189,10 @@
       <default>'square'</default>
       <summary>Pixel shape</summary>
       <description>Shape of the pixels.</description>
-      <range>
+      <choices>
         <choice value="square"/>
         <choice value="circle"/>
-      </range>
+      </choices>
     </key>
 
     <!-- Edge Detection -->
@@ -211,11 +211,11 @@
       <default>'sobel'</default>
       <summary>Edge kernel</summary>
       <description>Type of edge detection kernel.</description>
-      <range>
+      <choices>
         <choice value="sobel"/>
         <choice value="prewitt"/>
         <choice value="laplacian"/>
-      </range>
+      </choices>
     </key>
 
     <!-- Color Shift -->
