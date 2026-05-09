@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.spotlight" path="/org/gnome/shell/extensions/spotlight/">
+    <!-- Shader type -->
+    <key name="shader-type" type="s">
+      <default>'spotlight'</default>
+      <summary>Shader effect type</summary>
+      <description>Choose the shader effect.</description>
+      <range>
+        <choice value="spotlight"/>
+        <choice value="ripple"/>
+        <choice value="scanline"/>
+        <choice value="vignette"/>
+        <choice value="blur"/>
+        <choice value="glow"/>
+        <choice value="invert"/>
+        <choice value="pixelate"/>
+        <choice value="edge"/>
+        <choice value="colorShift"/>
+        <choice value="grid"/>
+        <choice value="neon"/>
+        <choice value="heatmap"/>
+      </range>
+    </key>
+
+    <!-- Common settings -->
+    <key name="radius" type="d">
+      <default>0.2</default>
+      <summary>Effect radius</summary>
+      <description>Radius of the effect (normalized to [0, 1]).</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+    <key name="color" type="as">
+      <default>['1.0', '1.0', '1.0']</default>
+      <summary>Effect color</summary>
+      <description>RGB color of the effect (normalized to [0, 1]).</description>
+    </key>
+    <key name="opacity" type="d">
+      <default>1.0</default>
+      <summary>Effect opacity</summary>
+      <description>Opacity of the effect (0.0 to 1.0).</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+    <key name="fade-delay" type="i">
+      <default>1000</default>
+      <summary>Fade delay</summary>
+      <description>Delay (ms) before fade-out after inactivity.</description>
+      <range min="0" max="5000"/>
+    </key>
+    <key name="easing" type="s">
+      <default>'ease-out-quad'</default>
+      <summary>Easing function</summary>
+      <description>Easing function for animations.</description>
+      <range>
+        <choice value="linear"/>
+        <choice value="ease-in-quad"/>
+        <choice value="ease-out-quad"/>
+        <choice value="ease-in-out-quad"/>
+        <choice value="ease-in-cubic"/>
+        <choice value="ease-out-cubic"/>
+        <choice value="ease-in-out-cubic"/>
+        <choice value="ease-in-elastic"/>
+        <choice value="ease-out-elastic"/>
+      </range>
+    </key>
+
+    <!-- Spotlight -->
+    <key name="spotlight-falloff" type="d">
+      <default>0.81</default>
+      <summary>Spotlight falloff</summary>
+      <description>Falloff factor for the spotlight gradient (0.0 to 1.0).</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+
+    <!-- Ripple -->
+    <key name="ripple-speed" type="d">
+      <default>5.0</default>
+      <summary>Ripple speed</summary>
+      <description>Speed of the ripple animation.</description>
+      <range min="1.0" max="20.0"/>
+    </key>
+    <key name="ripple-frequency" type="d">
+      <default>20.0</default>
+      <summary>Ripple frequency</summary>
+      <description>Frequency of the ripple waves.</description>
+      <range min="1.0" max="50.0"/>
+    </key>
+    <key name="ripple-amplitude" type="d">
+      <default>0.1</default>
+      <summary>Ripple amplitude</summary>
+      <description>Amplitude of the ripple waves.</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+
+    <!-- Scanline -->
+    <key name="scanline-width" type="d">
+      <default>0.01</default>
+      <summary>Scanline width</summary>
+      <description>Width of the scanlines (normalized to [0, 1]).</description>
+      <range min="0.001" max="0.1"/>
+    </key>
+    <key name="scanline-horizontal" type="b">
+      <default>true</default>
+      <summary>Scanline direction</summary>
+      <description>True for horizontal scanlines, false for vertical.</description>
+    </key>
+    <key name="scanline-density" type="d">
+      <default>100.0</default>
+      <summary>Scanline density</summary>
+      <description>Density of the scanlines.</description>
+      <range min="10.0" max="200.0"/>
+    </key>
+
+    <!-- Vignette -->
+    <key name="vignette-strength" type="d">
+      <default>0.8</default>
+      <summary>Vignette strength</summary>
+      <description>Strength of the vignette effect (0.0 to 1.0).</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+    <key name="vignette-inner-radius" type="d">
+      <default>0.0</default>
+      <summary>Vignette inner radius</summary>
+      <description>Inner radius where the effect is zero (0.0 to 1.0).</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+    <key name="vignette-outer-radius" type="d">
+      <default>1.5</default>
+      <summary>Vignette outer radius</summary>
+      <description>Outer radius where the effect is maximal (1.0 to 2.0).</description>
+      <range min="1.0" max="2.0"/>
+    </key>
+
+    <!-- Blur -->
+    <key name="blur-radius" type="d">
+      <default>10.0</default>
+      <summary>Blur radius</summary>
+      <description>Blur kernel size (in pixels).</description>
+      <range min="1.0" max="50.0"/>
+    </key>
+    <key name="blur-kernel-size" type="i">
+      <default>3</default>
+      <summary>Blur kernel size</summary>
+      <description>Size of the blur kernel (3 or 5).</description>
+      <range min="3" max="5"/>
+    </key>
+    <key name="blur-iterations" type="i">
+      <default>1</default>
+      <summary>Blur iterations</summary>
+      <description>Number of blur passes (1 to 3).</description>
+      <range min="1" max="3"/>
+    </key>
+
+    <!-- Glow -->
+    <key name="glow-intensity" type="d">
+      <default>1.0</default>
+      <summary>Glow intensity</summary>
+      <description>Intensity of the glow effect.</description>
+      <range min="0.1" max="10.0"/>
+    </key>
+    <key name="glow-falloff" type="d">
+      <default>5.0</default>
+      <summary>Glow falloff</summary>
+      <description>Falloff factor for the glow effect.</description>
+      <range min="1.0" max="20.0"/>
+    </key>
+    <key name="glow-pulse-speed" type="d">
+      <default>3.0</default>
+      <summary>Glow pulse speed</summary>
+      <description>Speed of the glow pulse animation (0.0 to disable).</description>
+      <range min="0.0" max="10.0"/>
+    </key>
+
+    <!-- Invert -->
+    <key name="invert-alpha" type="b">
+      <default>false</default>
+      <summary>Invert alpha</summary>
+      <description>Whether to invert the alpha channel.</description>
+    </key>
+
+    <!-- Pixelate -->
+    <key name="pixel-size" type="d">
+      <default>0.05</default>
+      <summary>Pixel size</summary>
+      <description>Size of the pixels (normalized to [0, 1]).</description>
+      <range min="0.01" max="0.2"/>
+    </key>
+    <key name="pixel-shape" type="s">
+      <default>'square'</default>
+      <summary>Pixel shape</summary>
+      <description>Shape of the pixels.</description>
+      <range>
+        <choice value="square"/>
+        <choice value="circle"/>
+      </range>
+    </key>
+
+    <!-- Edge Detection -->
+    <key name="edge-color" type="as">
+      <default>['1.0', '1.0', '1.0']</default>
+      <summary>Edge color</summary>
+      <description>Color of the detected edges.</description>
+    </key>
+    <key name="edge-threshold" type="d">
+      <default>0.5</default>
+      <summary>Edge threshold</summary>
+      <description>Threshold for edge detection (0.0 to 1.0).</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+    <key name="edge-kernel" type="s">
+      <default>'sobel'</default>
+      <summary>Edge kernel</summary>
+      <description>Type of edge detection kernel.</description>
+      <range>
+        <choice value="sobel"/>
+        <choice value="prewitt"/>
+        <choice value="laplacian"/>
+      </range>
+    </key>
+
+    <!-- Color Shift -->
+    <key name="hue-shift" type="d">
+      <default>3.14159</default>
+      <summary>Hue shift</summary>
+      <description>Hue shift in radians (-π to π).</description>
+      <range min="-3.14159" max="3.14159"/>
+    </key>
+    <key name="saturation" type="d">
+      <default>1.0</default>
+      <summary>Saturation</summary>
+      <description>Saturation of the effect (0.0 to 2.0).</description>
+      <range min="0.0" max="2.0"/>
+    </key>
+    <key name="brightness" type="d">
+      <default>1.0</default>
+      <summary>Brightness</summary>
+      <description>Brightness of the effect (0.0 to 2.0).</description>
+      <range min="0.0" max="2.0"/>
+    </key>
+
+    <!-- Grid -->
+    <key name="grid-size" type="d">
+      <default>0.1</default>
+      <summary>Grid size</summary>
+      <description>Size of the grid cells (normalized to [0, 1]).</description>
+      <range min="0.01" max="0.5"/>
+    </key>
+    <key name="grid-thickness" type="d">
+      <default>0.005</default>
+      <summary>Grid thickness</summary>
+      <description>Thickness of the grid lines (normalized to [0, 1]).</description>
+      <range min="0.001" max="0.05"/>
+    </key>
+    <key name="grid-color" type="as">
+      <default>['1.0', '1.0', '1.0']</default>
+      <summary>Grid color</summary>
+      <description>Color of the grid lines.</description>
+    </key>
+    <key name="grid-snap-to-mouse" type="b">
+      <default>true</default>
+      <summary>Snap to mouse</summary>
+      <description>Whether to snap the grid to the mouse position.</description>
+    </key>
+
+    <!-- Neon -->
+    <key name="neon-glow-strength" type="d">
+      <default>2.0</default>
+      <summary>Neon glow strength</summary>
+      <description>Intensity of the neon glow effect.</description>
+      <range min="0.1" max="10.0"/>
+    </key>
+    <key name="neon-pulse-speed" type="d">
+      <default>3.0</default>
+      <summary>Neon pulse speed</summary>
+      <description>Speed of the neon pulse animation.</description>
+      <range min="0.0" max="10.0"/>
+    </key>
+    <key name="neon-color" type="as">
+      <default>['0.0', '1.0', '1.0']</default>
+      <summary>Neon color</summary>
+      <description>Color of the neon effect.</description>
+    </key>
+    <key name="neon-bloom-radius" type="d">
+      <default>0.1</default>
+      <summary>Neon bloom radius</summary>
+      <description>Radius of the bloom effect (0.0 to 1.0).</description>
+      <range min="0.0" max="1.0"/>
+    </key>
+
+    <!-- Heatmap -->
+    <key name="heatmap-hot-color" type="as">
+      <default>['1.0', '0.0', '0.0']</default>
+      <summary>Hot color</summary>
+      <description>Color for hot areas (normalized RGB).</description>
+    </key>
+    <key name="heatmap-cold-color" type="as">
+      <default>['0.0', '0.0', '1.0']</default>
+      <summary>Cold color</summary>
+      <description>Color for cold areas (normalized RGB).</description>
+    </key>
+    <key name="heatmap-decay-rate" type="d">
+      <default>0.05</default>
+      <summary>Decay rate</summary>
+      <description>Rate at which heat points decay (0.01 to 0.1).</description>
+      <range min="0.01" max="0.1"/>
+    </key>
+    <key name="heatmap-point-size" type="i">
+      <default>5</default>
+      <summary>Point size</summary>
+      <description>Size of heat points (in pixels).</description>
+      <range min="1" max="20"/>
+    </key>
+  </schema>
+</schemalist>
