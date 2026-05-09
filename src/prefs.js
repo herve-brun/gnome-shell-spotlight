@@ -82,9 +82,9 @@ function fillPreferencesWindow(window) {
     settings.bind('fade-delay', fadeDelayRow, 'value', Gio.SettingsBindFlags.DEFAULT);
     commonGroup.add(fadeDelayRow);
 
-    // Easing function
-    const easingRow = new Adw.ComboRow({
-        title: 'Easing Function',
+    // Fade easing function
+    const fadeEasingRow = new Adw.ComboRow({
+        title: 'Fade Easing',
         model: new Gtk.StringList({
             strings: [
                 'linear', 'ease-in-quad', 'ease-out-quad', 'ease-in-out-quad',
@@ -93,8 +93,22 @@ function fillPreferencesWindow(window) {
             ],
         }),
     });
-    settings.bind('easing', easingRow, 'selected-item', Gio.SettingsBindFlags.DEFAULT);
-    commonGroup.add(easingRow);
+    settings.bind('fade-easing', fadeEasingRow, 'selected-item', Gio.SettingsBindFlags.DEFAULT);
+    commonGroup.add(fadeEasingRow);
+
+    // Animation easing function
+    const animationEasingRow = new Adw.ComboRow({
+        title: 'Animation Easing',
+        model: new Gtk.StringList({
+            strings: [
+                'linear', 'ease-in-quad', 'ease-out-quad', 'ease-in-out-quad',
+                'ease-in-cubic', 'ease-out-cubic', 'ease-in-out-cubic',
+                'ease-in-elastic', 'ease-out-elastic'
+            ],
+        }),
+    });
+    settings.bind('animation-easing', animationEasingRow, 'selected-item', Gio.SettingsBindFlags.DEFAULT);
+    commonGroup.add(animationEasingRow);
 
     mainPage.add(commonGroup);
     window.add(mainPage);
