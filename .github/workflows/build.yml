@@ -9,5 +9,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev
-      - name: Validate schema
+      - name: Compile and validate schema
         run: glib-compile-schemas --dry-run src/
