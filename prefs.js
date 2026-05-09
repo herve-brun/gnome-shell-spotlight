@@ -1,7 +1,322 @@
-const { GObject, Gio, Gtk, Adw } = imports.gi;
+const { GObject, Gio, Gtk, Adw, Gdk, GLib, Cairo } = imports.gi;
+
+// Easing functions metadata with colors
+const easingOptions = [
+    // Linear
+    { id: 'linear', name: 'Linear', color: '#888888', category: 'Basic' },
+    
+    // Quadratic
+    { id: 'ease-in-quad', name: 'Ease In Quad', color: '#FF6B6B', category: 'Quadratic' },
+    { id: 'ease-out-quad', name: 'Ease Out Quad', color: '#4ECDC4', category: 'Quadratic' },
+    { id: 'ease-in-out-quad', name: 'Ease In Out Quad', color: '#45B7D1', category: 'Quadratic' },
+    
+    // Cubic
+    { id: 'ease-in-cubic', name: 'Ease In Cubic', color: '#FFBE0B', category: 'Cubic' },
+    { id: 'ease-out-cubic', name: 'Ease Out Cubic', color: '#FB5607', category: 'Cubic' },
+    { id: 'ease-in-out-cubic', name: 'Ease In Out Cubic', color: '#8338EC', category: 'Cubic' },
+    
+    // Quartic
+    { id: 'ease-in-quart', name: 'Ease In Quart', color: '#3A86FF', category: 'Quartic' },
+    { id: 'ease-out-quart', name: 'Ease Out Quart', color: '#FF006E', category: 'Quartic' },
+    { id: 'ease-in-out-quart', name: 'Ease In Out Quart', color: '#A5DD9B', category: 'Quartic' },
+    
+    // Quintic
+    { id: 'ease-in-quint', name: 'Ease In Quint', color: '#F9C74F', category: 'Quintic' },
+    { id: 'ease-out-quint', name: 'Ease Out Quint', color: '#90BE6D', category: 'Quintic' },
+    { id: 'ease-in-out-quint', name: 'Ease In Out Quint', color: '#577590', category: 'Quintic' },
+    
+    // Sine
+    { id: 'ease-in-sine', name: 'Ease In Sine', color: '#43AA8B', category: 'Sine' },
+    { id: 'ease-out-sine', name: 'Ease Out Sine', color: '#F94144', category: 'Sine' },
+    { id: 'ease-in-out-sine', name: 'Ease In Out Sine', color: '#F3722C', category: 'Sine' },
+    
+    // Exponential
+    { id: 'ease-in-expo', name: 'Ease In Expo', color: '#F8961E', category: 'Exponential' },
+    { id: 'ease-out-expo', name: 'Ease Out Expo', color: '#F9844A', category: 'Exponential' },
+    { id: 'ease-in-out-expo', name: 'Ease In Out Expo', color: '#F9C74F', category: 'Exponential' },
+    
+    // Circular
+    { id: 'ease-in-circ', name: 'Ease In Circ', color: '#90BE6D', category: 'Circular' },
+    { id: 'ease-out-circ', name: 'Ease Out Circ', color: '#43AA8B', category: 'Circular' },
+    { id: 'ease-in-out-circ', name: 'Ease In Out Circ', color: '#577590', category: 'Circular' },
+    
+    // Back
+    { id: 'ease-in-back', name: 'Ease In Back', color: '#A5DD9B', category: 'Back' },
+    { id: 'ease-out-back', name: 'Ease Out Back', color: '#4ECDC4', category: 'Back' },
+    { id: 'ease-in-out-back', name: 'Ease In Out Back', color: '#45B7D1', category: 'Back' },
+    
+    // Elastic
+    { id: 'ease-in-elastic', name: 'Ease In Elastic', color: '#FF6B6B', category: 'Elastic' },
+    { id: 'ease-out-elastic', name: 'Ease Out Elastic', color: '#FB5607', category: 'Elastic' },
+    { id: 'ease-in-out-elastic', name: 'Ease In Out Elastic', color: '#FFBE0B', category: 'Elastic' },
+    
+    // Bounce
+    { id: 'ease-in-bounce', name: 'Ease In Bounce', color: '#F9844A', category: 'Bounce' },
+    { id: 'ease-out-bounce', name: 'Ease Out Bounce', color: '#F8961E', category: 'Bounce' },
+    { id: 'ease-in-out-bounce', name: 'Ease In Out Bounce', color: '#F9C74F', category: 'Bounce' },
+];
+
+// Easing functions for path generation
+const easingFuncs = {
+    linear: t => t,
+    'ease-in-quad': t => t * t,
+    'ease-out-quad': t => t * (2 - t),
+    'ease-in-out-quad': t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    'ease-in-cubic': t => t * t * t,
+    'ease-out-cubic': t => (--t) * t * t + 1,
+    'ease-in-out-cubic': t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+    'ease-in-quart': t => t * t * t * t,
+    'ease-out-quart': t => 1 - (--t) * t * t * t,
+    'ease-in-out-quart': t => t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t,
+    'ease-in-quint': t => t * t * t * t * t,
+    'ease-out-quint': t => 1 + (--t) * t * t * t * t,
+    'ease-in-out-quint': t => t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t,
+    'ease-in-sine': t => 1 - Math.cos((t * Math.PI) / 2),
+    'ease-out-sine': t => Math.sin((t * Math.PI) / 2),
+    'ease-in-out-sine': t => -0.5 * (Math.cos(t * Math.PI) - 1),
+    'ease-in-expo': t => t === 0 ? 0 : Math.pow(2, 10 * t - 10),
+    'ease-out-expo': t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+    'ease-in-out-expo': t => t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? 0.5 * Math.pow(2, 20 * t - 10) : 0.5 * (2 - Math.pow(2, -20 * t + 10)),
+    'ease-in-circ': t => 1 - Math.sqrt(1 - t * t),
+    'ease-out-circ': t => Math.sqrt(1 - (t = t - 1) * t),
+    'ease-in-out-circ': t => t < 0.5 ? (1 - Math.sqrt(1 - 4 * t * t)) / 2 : (Math.sqrt(1 - (t = t * 2 - 2) * t) + 1) / 2,
+    'ease-in-back': t => {
+        const c1 = 1.70158, c3 = c1 + 1;
+        return c3 * t * t * t - c1 * t * t;
+    },
+    'ease-out-back': t => {
+        const c1 = 1.70158, c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    },
+    'ease-in-out-back': t => {
+        const c1 = 1.70158, c2 = c1 * 1.525;
+        return t < 0.5 ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2 : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+    },
+    'ease-in-elastic': t => {
+        const c4 = (2 * Math.PI) / 3;
+        return t === 0 ? 0 : t === 1 ? 1 : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
+    },
+    'ease-out-elastic': t => {
+        const c4 = (2 * Math.PI) / 3;
+        return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+    },
+    'ease-in-out-elastic': t => {
+        const c5 = (2 * Math.PI) / 4.5;
+        return t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2 : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1;
+    },
+    'ease-in-bounce': t => 1 - easingFuncs['ease-out-bounce'](1 - t),
+    'ease-out-bounce': t => {
+        if (t < 1 / 2.75) return 7.5625 * t * t;
+        else if (t < 2 / 2.75) return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
+        else if (t < 2.5 / 2.75) return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+        else return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+    },
+    'ease-in-out-bounce': t => t < 0.5 ? (1 - easingFuncs['ease-out-bounce'](1 - 2 * t)) / 2 : (1 + easingFuncs['ease-out-bounce'](2 * t - 1)) / 2,
+};
+
+// Custom DrawingArea for easing curve preview
+const EasingPreview = GObject.registerClass(
+    { GTypeName: 'EasingPreview' },
+    class EasingPreview extends Gtk.DrawingArea {
+        _init(params) {
+            super._init(params);
+            this.set_size_request(80, 40);
+            this._easingId = params.easingId || 'linear';
+            this._color = params.color || '#888888';
+        }
+        
+        get easingId() {
+            return this._easingId;
+        }
+        
+        set easingId(value) {
+            this._easingId = value;
+            this.queue_draw();
+        }
+        
+        get color() {
+            return this._color;
+        }
+        
+        set color(value) {
+            this._color = value;
+            this.queue_draw();
+        }
+        
+        vfunc_snapshot(snapshot) {
+            const easing = easingOptions.find(e => e.id === this._easingId) || easingOptions[0];
+            const func = easingFuncs[this._easingId] || easingFuncs.linear;
+            const color = easing.color || this._color;
+            
+            const width = this.get_allocated_width();
+            const height = this.get_allocated_height();
+            
+            if (width <= 0 || height <= 0) return;
+            
+            const cr = snapshot.append_cairo(new Cairo.Rectangle({ x: 0, y: 0, width, height }));
+            
+            // Background
+            cr.setSourceRGB(0.15, 0.15, 0.15);
+            cr.rectangle(0, 0, width, height);
+            cr.fill();
+            
+            // Grid lines
+            cr.setSourceRGB(0.3, 0.3, 0.3);
+            cr.setLineWidth(0.5);
+            cr.setDash([2, 2], 0);
+            
+            // Horizontal line at bottom
+            cr.moveTo(0, height - 1);
+            cr.lineTo(width, height - 1);
+            cr.stroke();
+            
+            // Vertical lines
+            cr.moveTo(0, 0);
+            cr.lineTo(0, height);
+            cr.stroke();
+            cr.moveTo(width - 1, 0);
+            cr.lineTo(width - 1, height);
+            cr.stroke();
+            
+            // Reset dash
+            cr.setDash([], 0);
+            
+            // Draw easing curve
+            cr.setSourceRGB(
+                parseInt(color.slice(1, 3), 16) / 255,
+                parseInt(color.slice(3, 5), 16) / 255,
+                parseInt(color.slice(5, 7), 16) / 255
+            );
+            cr.setLineWidth(2);
+            cr.setLineCap(Cairo.LineCap.ROUND);
+            cr.setLineJoin(Cairo.LineJoin.ROUND);
+            
+            cr.moveTo(0, height - 1);
+            const steps = 100;
+            for (let i = 1; i <= steps; i++) {
+                const t = i / steps;
+                const x = (t * (width - 1));
+                const y = height - 1 - (func(t) * (height - 2));
+                cr.lineTo(x, y);
+            }
+            cr.stroke();
+            
+            cr.$dispose();
+        }
+    }
+);
+
+// Create a selectable easing option row
+function createEasingOption(easing, selectedEasing, onSelected) {
+    const row = new Gtk.Box({
+        orientation: Gtk.Orientation.HORIZONTAL,
+        spacing: 12,
+        margin_top: 4,
+        margin_bottom: 4,
+        margin_start: 12,
+        margin_end: 12,
+    });
+    row.add_css_class('easing-option');
+    
+    // Create preview widget
+    const preview = new EasingPreview({
+        easingId: easing.id,
+        color: easing.color,
+        width_request: 80,
+        height_request: 40,
+    });
+    
+    // Create label
+    const label = new Gtk.Label({
+        label: easing.name,
+        halign: Gtk.Align.START,
+        hexpand: true,
+    });
+    label.add_css_class('easing-label');
+    
+    // Create selection indicator
+    const check = new Gtk.Image({
+        icon_name: 'object-select-symbolic',
+        pixel_size: 16,
+        visible: easing.id === selectedEasing,
+    });
+    check.add_css_class('easing-check');
+    
+    // Pack widgets
+    row.append(preview);
+    row.append(label);
+    row.append(check);
+    
+    // Add click handler
+    const click = new Gtk.GestureClick();
+    click.connect('pressed', () => {
+        onSelected(easing.id);
+    });
+    row.add_controller(click);
+    
+    // Update selection state
+    function updateSelection(isSelected) {
+        check.visible = isSelected;
+        if (isSelected) {
+            row.add_css_class('selected');
+        } else {
+            row.remove_css_class('selected');
+        }
+    }
+    
+    updateSelection(easing.id === selectedEasing);
+    
+    // Return row with update method
+    return { widget: row, updateSelection };
+}
+
+// Custom CSS for easing selector
+const easingCSS = `
+.easing-option {
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 200ms ease;
+    cursor: pointer;
+}
+
+.easing-option:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.easing-option.selected {
+    background-color: rgba(78, 205, 196, 0.15);
+}
+
+.easing-label {
+    font-size: 13px;
+    color: #ffffff;
+}
+
+.easing-check {
+    color: #4ECDC4;
+    opacity: 0;
+    transition: opacity 200ms ease;
+}
+
+.easing-option.selected .easing-check {
+    opacity: 1;
+}
+`;
 
 function init() {
-    // Nothing to do here
+    // Apply custom CSS
+    const cssProvider = new Gtk.CssProvider();
+    cssProvider.load_from_data(easingCSS, -1);
+    
+    try {
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            cssProvider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
+    } catch (e) {
+        logError(`Error applying CSS: ${e}`);
+    }
 }
 
 function fillPreferencesWindow(window) {
@@ -82,22 +397,92 @@ function fillPreferencesWindow(window) {
     settings.bind('fade-delay', fadeDelayRow, 'value', Gio.SettingsBindFlags.DEFAULT);
     commonGroup.add(fadeDelayRow);
 
-    // Easing function
-    const easingRow = new Adw.ComboRow({
-        title: 'Easing Function',
-        model: new Gtk.StringList({
-            strings: [
-                'linear', 'ease-in-quad', 'ease-out-quad', 'ease-in-out-quad',
-                'ease-in-cubic', 'ease-out-cubic', 'ease-in-out-cubic',
-                'ease-in-elastic', 'ease-out-elastic'
-            ],
-        }),
-    });
-    settings.bind('easing', easingRow, 'selected-item', Gio.SettingsBindFlags.DEFAULT);
-    commonGroup.add(easingRow);
-
     mainPage.add(commonGroup);
     window.add(mainPage);
+
+    // Create Easing Selection Page
+    const easingPage = new Adw.PreferencesPage({
+        title: 'Easing Functions',
+        icon_name: 'graph-symbolic',
+    });
+
+    // Get current easing values
+    let currentFadeEasing = settings.get_string('fade-easing');
+    let currentAnimationEasing = settings.get_string('animation-easing');
+
+    // Create easing selection groups by category
+    const categories = {};
+    for (const easing of easingOptions) {
+        if (!categories[easing.category]) {
+            categories[easing.category] = [];
+        }
+        categories[easing.category].push(easing);
+    }
+
+    // Store all option widgets for updates
+    const fadeOptions = [];
+    const animOptions = [];
+
+    // Add Fade Easing section
+    const fadeEasingGroup = new Adw.PreferencesGroup({
+        title: 'Fade Easing',
+        description: 'Easing function for fade in/out animations',
+    });
+
+    for (const [category, easings] of Object.entries(categories)) {
+        const categoryGroup = new Adw.PreferencesGroup({
+            title: category,
+            margin_top: 12,
+        });
+
+        for (const easing of easings) {
+            const option = createEasingOption(easing, currentFadeEasing, (id) => {
+                currentFadeEasing = id;
+                settings.set_string('fade-easing', id);
+                for (const opt of fadeOptions) {
+                    const label = opt.widget.get_children()[1];
+                    opt.updateSelection(easing.id === id);
+                }
+            });
+            fadeOptions.push(option);
+            categoryGroup.add(option.widget);
+        }
+
+        fadeEasingGroup.add(categoryGroup);
+    }
+
+    easingPage.add(fadeEasingGroup);
+
+    // Add Animation Easing section
+    const animEasingGroup = new Adw.PreferencesGroup({
+        title: 'Animation Easing',
+        description: 'Easing function for time-based animations (ripple, neon)',
+        margin_top: 24,
+    });
+
+    for (const [category, easings] of Object.entries(categories)) {
+        const categoryGroup = new Adw.PreferencesGroup({
+            title: category,
+            margin_top: 12,
+        });
+
+        for (const easing of easings) {
+            const option = createEasingOption(easing, currentAnimationEasing, (id) => {
+                currentAnimationEasing = id;
+                settings.set_string('animation-easing', id);
+                for (const opt of animOptions) {
+                    opt.updateSelection(easing.id === id);
+                }
+            });
+            animOptions.push(option);
+            categoryGroup.add(option.widget);
+        }
+
+        animEasingGroup.add(categoryGroup);
+    }
+
+    easingPage.add(animEasingGroup);
+    window.add(easingPage);
 
     // Shader-specific pages
     const shaderPages = {};

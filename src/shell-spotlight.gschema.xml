@@ -47,10 +47,10 @@
       <description>Delay (ms) before fade-out after inactivity.</description>
       <range min="0" max="5000"/>
     </key>
-    <key name="easing" type="s">
+    <key name="fade-easing" type="s">
       <default>'ease-out-quad'</default>
-      <summary>Easing function</summary>
-      <description>Easing function for animations.</description>
+      <summary>Fade easing function</summary>
+      <description>Easing function for fade animations.</description>
       <choices>
         <choice value="linear"/>
         <choice value="ease-in-quad"/>
@@ -59,8 +59,68 @@
         <choice value="ease-in-cubic"/>
         <choice value="ease-out-cubic"/>
         <choice value="ease-in-out-cubic"/>
+        <choice value="ease-in-quart"/>
+        <choice value="ease-out-quart"/>
+        <choice value="ease-in-out-quart"/>
+        <choice value="ease-in-quint"/>
+        <choice value="ease-out-quint"/>
+        <choice value="ease-in-out-quint"/>
+        <choice value="ease-in-sine"/>
+        <choice value="ease-out-sine"/>
+        <choice value="ease-in-out-sine"/>
+        <choice value="ease-in-expo"/>
+        <choice value="ease-out-expo"/>
+        <choice value="ease-in-out-expo"/>
+        <choice value="ease-in-circ"/>
+        <choice value="ease-out-circ"/>
+        <choice value="ease-in-out-circ"/>
+        <choice value="ease-in-back"/>
+        <choice value="ease-out-back"/>
+        <choice value="ease-in-out-back"/>
         <choice value="ease-in-elastic"/>
         <choice value="ease-out-elastic"/>
+        <choice value="ease-in-out-elastic"/>
+        <choice value="ease-in-bounce"/>
+        <choice value="ease-out-bounce"/>
+        <choice value="ease-in-out-bounce"/>
+      </choices>
+    </key>
+    <key name="animation-easing" type="s">
+      <default>'linear'</default>
+      <summary>Animation easing function</summary>
+      <description>Easing function for time-based animations (ripple, neon).</description>
+      <choices>
+        <choice value="linear"/>
+        <choice value="ease-in-quad"/>
+        <choice value="ease-out-quad"/>
+        <choice value="ease-in-out-quad"/>
+        <choice value="ease-in-cubic"/>
+        <choice value="ease-out-cubic"/>
+        <choice value="ease-in-out-cubic"/>
+        <choice value="ease-in-quart"/>
+        <choice value="ease-out-quart"/>
+        <choice value="ease-in-out-quart"/>
+        <choice value="ease-in-quint"/>
+        <choice value="ease-out-quint"/>
+        <choice value="ease-in-out-quint"/>
+        <choice value="ease-in-sine"/>
+        <choice value="ease-out-sine"/>
+        <choice value="ease-in-out-sine"/>
+        <choice value="ease-in-expo"/>
+        <choice value="ease-out-expo"/>
+        <choice value="ease-in-out-expo"/>
+        <choice value="ease-in-circ"/>
+        <choice value="ease-out-circ"/>
+        <choice value="ease-in-out-circ"/>
+        <choice value="ease-in-back"/>
+        <choice value="ease-out-back"/>
+        <choice value="ease-in-out-back"/>
+        <choice value="ease-in-elastic"/>
+        <choice value="ease-out-elastic"/>
+        <choice value="ease-in-out-elastic"/>
+        <choice value="ease-in-bounce"/>
+        <choice value="ease-out-bounce"/>
+        <choice value="ease-in-out-bounce"/>
       </choices>
     </key>
 

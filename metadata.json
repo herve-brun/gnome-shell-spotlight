@@ -1,7 +1,7 @@
 {
   "name": "Spotlight Shaders",
   "description": "A customizable GNOME Shell extension with 13 shader effects (spotlight, ripple, scanline, vignette, blur, glow, invert, pixelate, edge detection, color shift, grid, neon, heatmap). Fully configurable via GTK4 preferences dialog.",
-  "uuid": "spotlight-shaders@herve-brun",
+  "uuid": "gnome-shell-spotlight@herve-brun",
   "shell-version": ["42", "43", "44", "45", "46"],
   "url": "https://github.com/herve-brun/gnome-shell-spotlight",
   "version": 1,
