@@ -7,13 +7,62 @@ const falloffFactor = 0.81;
 
 // === EASING FUNCTIONS ===
 const easingFunctions = {
+    // Linear
     linear: t => t,
+
+    // Quadratic
     'ease-in-quad': t => t * t,
     'ease-out-quad': t => t * (2 - t),
     'ease-in-out-quad': t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+
+    // Cubic
     'ease-in-cubic': t => t * t * t,
     'ease-out-cubic': t => (--t) * t * t + 1,
     'ease-in-out-cubic': t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+
+    // Quartic
+    'ease-in-quart': t => t * t * t * t,
+    'ease-out-quart': t => 1 - (--t) * t * t * t,
+    'ease-in-out-quart': t => t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t,
+
+    // Quintic
+    'ease-in-quint': t => t * t * t * t * t,
+    'ease-out-quint': t => 1 + (--t) * t * t * t * t,
+    'ease-in-out-quint': t => t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t,
+
+    // Sine
+    'ease-in-sine': t => 1 - Math.cos((t * Math.PI) / 2),
+    'ease-out-sine': t => Math.sin((t * Math.PI) / 2),
+    'ease-in-out-sine': t => -0.5 * (Math.cos(t * Math.PI) - 1),
+
+    // Exponential
+    'ease-in-expo': t => t === 0 ? 0 : Math.pow(2, 10 * t - 10),
+    'ease-out-expo': t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+    'ease-in-out-expo': t => t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? 0.5 * Math.pow(2, 20 * t - 10) : 0.5 * (2 - Math.pow(2, -20 * t + 10)),
+
+    // Circular
+    'ease-in-circ': t => 1 - Math.sqrt(1 - t * t),
+    'ease-out-circ': t => Math.sqrt(1 - (t = t - 1) * t),
+    'ease-in-out-circ': t => t < 0.5 ? (1 - Math.sqrt(1 - 4 * t * t)) / 2 : (Math.sqrt(1 - (t = t * 2 - 2) * t) + 1) / 2,
+
+    // Back
+    'ease-in-back': t => {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return c3 * t * t * t - c1 * t * t;
+    },
+    'ease-out-back': t => {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    },
+    'ease-in-out-back': t => {
+        const c1 = 1.70158;
+        const c2 = c1 * 1.525;
+        return t < 0.5 ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2 : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+    },
+
+    // Elastic
     'ease-in-elastic': t => {
         const c4 = (2 * Math.PI) / 3;
         return t === 0 ? 0 : t === 1 ? 1 : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
@@ -22,11 +71,86 @@ const easingFunctions = {
         const c4 = (2 * Math.PI) / 3;
         return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
     },
+    'ease-in-out-elastic': t => {
+        const c5 = (2 * Math.PI) / 4.5;
+        return t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2 : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1;
+    },
+
+    // Bounce
+    'ease-in-bounce': t => 1 - easingFunctions['ease-out-bounce'](1 - t),
+    'ease-out-bounce': t => {
+        if (t < 1 / 2.75) {
+            return 7.5625 * t * t;
+        } else if (t < 2 / 2.75) {
+            return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
+        } else if (t < 2.5 / 2.75) {
+            return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+        } else {
+            return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+        }
+    },
+    'ease-in-out-bounce': t => t < 0.5 ? (1 - easingFunctions['ease-out-bounce'](1 - 2 * t)) / 2 : (1 + easingFunctions['ease-out-bounce'](2 * t - 1)) / 2,
 };
 
 function applyEasing(t, easingName) {
     const easing = easingFunctions[easingName] || easingFunctions.linear;
     return easing(t);
+}
+
+// Easing metadata for UI preview
+const easingMetadata = {
+    linear: { name: 'Linear', color: '#888888' },
+    'ease-in-quad': { name: 'Ease In Quad', color: '#FF6B6B' },
+    'ease-out-quad': { name: 'Ease Out Quad', color: '#4ECDC4' },
+    'ease-in-out-quad': { name: 'Ease In Out Quad', color: '#45B7D1' },
+    'ease-in-cubic': { name: 'Ease In Cubic', color: '#FFBE0B' },
+    'ease-out-cubic': { name: 'Ease Out Cubic', color: '#FB5607' },
+    'ease-in-out-cubic': { name: 'Ease In Out Cubic', color: '#8338EC' },
+    'ease-in-quart': { name: 'Ease In Quart', color: '#3A86FF' },
+    'ease-out-quart': { name: 'Ease Out Quart', color: '#FF006E' },
+    'ease-in-out-quart': { name: 'Ease In Out Quart', color: '#A5DD9B' },
+    'ease-in-quint': { name: 'Ease In Quint', color: '#F9C74F' },
+    'ease-out-quint': { name: 'Ease Out Quint', color: '#90BE6D' },
+    'ease-in-out-quint': { name: 'Ease In Out Quint', color: '#577590' },
+    'ease-in-sine': { name: 'Ease In Sine', color: '#43AA8B' },
+    'ease-out-sine': { name: 'Ease Out Sine', color: '#F94144' },
+    'ease-in-out-sine': { name: 'Ease In Out Sine', color: '#F3722C' },
+    'ease-in-expo': { name: 'Ease In Expo', color: '#F8961E' },
+    'ease-out-expo': { name: 'Ease Out Expo', color: '#F9844A' },
+    'ease-in-out-expo': { name: 'Ease In Out Expo', color: '#F9C74F' },
+    'ease-in-circ': { name: 'Ease In Circ', color: '#90BE6D' },
+    'ease-out-circ': { name: 'Ease Out Circ', color: '#43AA8B' },
+    'ease-in-out-circ': { name: 'Ease In Out Circ', color: '#577590' },
+    'ease-in-back': { name: 'Ease In Back', color: '#A5DD9B' },
+    'ease-out-back': { name: 'Ease Out Back', color: '#4ECDC4' },
+    'ease-in-out-back': { name: 'Ease In Out Back', color: '#45B7D1' },
+    'ease-in-elastic': { name: 'Ease In Elastic', color: '#FF6B6B' },
+    'ease-out-elastic': { name: 'Ease Out Elastic', color: '#FB5607' },
+    'ease-in-out-elastic': { name: 'Ease In Out Elastic', color: '#FFBE0B' },
+    'ease-in-bounce': { name: 'Ease In Bounce', color: '#F9844A' },
+    'ease-out-bounce': { name: 'Ease Out Bounce', color: '#F8961E' },
+    'ease-in-out-bounce': { name: 'Ease In Out Bounce', color: '#F9C74F' },
+};
+
+// Generate SVG preview for easing functions
+function generateEasingSVG(easingName, width = 100, height = 30) {
+    const easing = easingFunctions[easingName] || easingFunctions.linear;
+    const color = easingMetadata[easingName]?.color || '#888888';
+    const name = easingMetadata[easingName]?.name || easingName;
+
+    const points = [];
+    for (let i = 0; i <= 10; i++) {
+        const t = i / 10;
+        const x = t * (width - 10);
+        const y = height - 10 - easing(t) * (height - 10);
+        points.push(`${x},${y}`);
+    }
+
+    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${width}" height="${height}" fill="#00000000" stroke="#333" stroke-width="1"/>
+        <polyline points="${points.join(' ')}" fill="none" stroke="${color}" stroke-width="2"/>
+        <text x="5" y="${height - 5}" font-size="8" fill="${color}" font-family="sans-serif">${name}</text>
+    </svg>`;
 }
 
 // === SHADER REGISTRY ===
