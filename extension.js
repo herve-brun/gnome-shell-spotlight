@@ -7,130 +7,184 @@ const falloffFactor = 0.81;
 
 // === EASING FUNCTIONS ===
 const easingFunctions = {
-    // Linear
-    linear: t => t,
+  // Linear
+  linear: (t) => t,
 
-    // Quadratic
-    'ease-in-quad': t => t * t,
-    'ease-out-quad': t => t * (2 - t),
-    'ease-in-out-quad': t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  // Quadratic
+  "ease-in-quad": (t) => t * t,
+  "ease-out-quad": (t) => t * (2 - t),
+  "ease-in-out-quad": (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
 
-    // Cubic
-    'ease-in-cubic': t => t * t * t,
-    'ease-out-cubic': t => (--t) * t * t + 1,
-    'ease-in-out-cubic': t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+  // Cubic
+  "ease-in-cubic": (t) => t * t * t,
+  "ease-out-cubic": (t) => --t * t * t + 1,
+  "ease-in-out-cubic": (t) =>
+    t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
 
-    // Quartic
-    'ease-in-quart': t => t * t * t * t,
-    'ease-out-quart': t => 1 - (--t) * t * t * t,
-    'ease-in-out-quart': t => t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t,
+  // Quartic
+  "ease-in-quart": (t) => t * t * t * t,
+  "ease-out-quart": (t) => 1 - --t * t * t * t,
+  "ease-in-out-quart": (t) =>
+    t < 0.5 ? 8 * t * t * t * t : 1 - 8 * --t * t * t * t,
 
-    // Quintic
-    'ease-in-quint': t => t * t * t * t * t,
-    'ease-out-quint': t => 1 + (--t) * t * t * t * t,
-    'ease-in-out-quint': t => t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t,
+  // Quintic
+  "ease-in-quint": (t) => t * t * t * t * t,
+  "ease-out-quint": (t) => 1 + --t * t * t * t * t,
+  "ease-in-out-quint": (t) =>
+    t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t,
 
-    // Sine
-    'ease-in-sine': t => 1 - Math.cos((t * Math.PI) / 2),
-    'ease-out-sine': t => Math.sin((t * Math.PI) / 2),
-    'ease-in-out-sine': t => -0.5 * (Math.cos(t * Math.PI) - 1),
+  // Sine
+  "ease-in-sine": (t) => 1 - Math.cos((t * Math.PI) / 2),
+  "ease-out-sine": (t) => Math.sin((t * Math.PI) / 2),
+  "ease-in-out-sine": (t) => -0.5 * (Math.cos(t * Math.PI) - 1),
 
-    // Exponential
-    'ease-in-expo': t => t === 0 ? 0 : Math.pow(2, 10 * t - 10),
-    'ease-out-expo': t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
-    'ease-in-out-expo': t => t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? 0.5 * Math.pow(2, 20 * t - 10) : 0.5 * (2 - Math.pow(2, -20 * t + 10)),
+  // Exponential
+  "ease-in-expo": (t) => (t === 0 ? 0 : Math.pow(2, 10 * t - 10)),
+  "ease-out-expo": (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+  "ease-in-out-expo": (t) =>
+    t === 0
+      ? 0
+      : t === 1
+        ? 1
+        : t < 0.5
+          ? 0.5 * Math.pow(2, 20 * t - 10)
+          : 0.5 * (2 - Math.pow(2, -20 * t + 10)),
 
-    // Circular
-    'ease-in-circ': t => 1 - Math.sqrt(1 - t * t),
-    'ease-out-circ': t => Math.sqrt(1 - (t = t - 1) * t),
-    'ease-in-out-circ': t => t < 0.5 ? (1 - Math.sqrt(1 - 4 * t * t)) / 2 : (Math.sqrt(1 - (t = t * 2 - 2) * t) + 1) / 2,
+  // Circular
+  "ease-in-circ": (t) => 1 - Math.sqrt(1 - t * t),
+  "ease-out-circ": (t) => Math.sqrt(1 - (t = t - 1) * t),
+  "ease-in-out-circ": (t) =>
+    t < 0.5
+      ? (1 - Math.sqrt(1 - 4 * t * t)) / 2
+      : (Math.sqrt(1 - (t = t * 2 - 2) * t) + 1) / 2,
 
-    // Back
-    'ease-in-back': t => {
-        const c1 = 1.70158;
-        const c3 = c1 + 1;
-        return c3 * t * t * t - c1 * t * t;
-    },
-    'ease-out-back': t => {
-        const c1 = 1.70158;
-        const c3 = c1 + 1;
-        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-    },
-    'ease-in-out-back': t => {
-        const c1 = 1.70158;
-        const c2 = c1 * 1.525;
-        return t < 0.5 ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2 : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
-    },
+  // Back
+  "ease-in-back": (t) => {
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return c3 * t * t * t - c1 * t * t;
+  },
+  "ease-out-back": (t) => {
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  },
+  "ease-in-out-back": (t) => {
+    const c1 = 1.70158;
+    const c2 = c1 * 1.525;
+    return t < 0.5
+      ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
+      : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+  },
 
-    // Elastic
-    'ease-in-elastic': t => {
-        const c4 = (2 * Math.PI) / 3;
-        return t === 0 ? 0 : t === 1 ? 1 : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
-    },
-    'ease-out-elastic': t => {
-        const c4 = (2 * Math.PI) / 3;
-        return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
-    },
-    'ease-in-out-elastic': t => {
-        const c5 = (2 * Math.PI) / 4.5;
-        return t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2 : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1;
-    },
+  // Elastic
+  "ease-in-elastic": (t) => {
+    const c4 = (2 * Math.PI) / 3;
+    return t === 0
+      ? 0
+      : t === 1
+        ? 1
+        : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
+  },
+  "ease-out-elastic": (t) => {
+    const c4 = (2 * Math.PI) / 3;
+    return t === 0
+      ? 0
+      : t === 1
+        ? 1
+        : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+  },
+  "ease-in-out-elastic": (t) => {
+    const c5 = (2 * Math.PI) / 4.5;
+    return t === 0
+      ? 0
+      : t === 1
+        ? 1
+        : t < 0.5
+          ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2
+          : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 +
+            1;
+  },
 
-    // Bounce
-    'ease-in-bounce': t => 1 - easingFunctions['ease-out-bounce'](1 - t),
-    'ease-out-bounce': t => {
-        if (t < 1 / 2.75) {
-            return 7.5625 * t * t;
-        } else if (t < 2 / 2.75) {
-            return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
-        } else if (t < 2.5 / 2.75) {
-            return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
-        } else {
-            return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
-        }
-    },
-    'ease-in-out-bounce': t => t < 0.5 ? (1 - easingFunctions['ease-out-bounce'](1 - 2 * t)) / 2 : (1 + easingFunctions['ease-out-bounce'](2 * t - 1)) / 2,
+  // Bounce
+  "ease-in-bounce": (t) => 1 - easingFunctions["ease-out-bounce"](1 - t),
+  "ease-out-bounce": (t) => {
+    if (t < 1 / 2.75) {
+      return 7.5625 * t * t;
+    } else if (t < 2 / 2.75) {
+      return 7.5625 * (t -= 1.5 / 2.75) * t + 0.75;
+    } else if (t < 2.5 / 2.75) {
+      return 7.5625 * (t -= 2.25 / 2.75) * t + 0.9375;
+    } else {
+      return 7.5625 * (t -= 2.625 / 2.75) * t + 0.984375;
+    }
+  },
+  "ease-in-out-bounce": (t) =>
+    t < 0.5
+      ? (1 - easingFunctions["ease-out-bounce"](1 - 2 * t)) / 2
+      : (1 + easingFunctions["ease-out-bounce"](2 * t - 1)) / 2,
 };
 
 function applyEasing(t, easingName) {
-    const easing = easingFunctions[easingName] || easingFunctions.linear;
-    return easing(t);
+  const easing = easingFunctions[easingName] || easingFunctions.linear;
+  return easing(t);
 }
 
 // Easing metadata for UI preview
 const easingMetadata = {
-    linear: { name: 'Linear', color: '#888888' },
-    'ease-in-quad': { name: 'Ease In Quad', color: '#FF6B6B' },
-    'ease-out-quad': { name: 'Ease Out Quad', color: '#4ECDC4' },
-    'ease-in-out-quad': { name: 'Ease In Out Quad', color: '#45B7D1' },
-    'ease-in-cubic': { name: 'Ease In Cubic', color: '#FFBE0B' },
-    'ease-out-cubic': { name: 'Ease Out Cubic', color: '#FB5607' },
-    'ease-in-out-cubic': { name: 'Ease In Out Cubic', color: '#8338EC' },
-    'ease-in-quart': { name: 'Ease In Quart', color: '#3A86FF' },
-    'ease-out-quart': { name: 'Ease Out Quart', color: '#FF006E' },
-    'ease-in-out-quart': { name: 'Ease In Out Quart', color: '#A5DD9B' },
-    'ease-in-quint': { name: 'Ease In Quint', color: '#F9C74F' },
-    'ease-out-quint': { name: 'Ease Out Quint', color: '#90BE6D' },
-    'ease-in-out-quint': { name: 'Ease In Out Quint', color: '#577590' },
-    'ease-in-sine': { name: 'Ease In Sine', color: '#43AA8B' },
-    'ease-out-sine': { name: 'Ease Out Sine', color: '#F94144' },
-    'ease-in-out-sine': { name: 'Ease In Out Sine', color: '#F3722C' },
-    'ease-in-expo': { name: 'Ease In Expo', color: '#F8961E' },
-    'ease-out-expo': { name: 'Ease Out Expo', color: '#F9844A' },
-    'ease-in-out-expo': { name: 'Ease In Out Expo', color: '#F9C74F' },
-    'ease-in-circ': { name: 'Ease In Circ', color: '#90BE6D' },
-    'ease-out-circ': { name: 'Ease Out Circ', color: '#43AA8B' },
-    'ease-in-out-circ': { name: 'Ease In Out Circ', color: '#577590' },
-    'ease-in-back': { name: 'Ease In Back', color: '#A5DD9B' },
-    'ease-out-back': { name: 'Ease Out Back', color: '#4ECDC4' },
-    'ease-in-out-back': { name: 'Ease In Out Back', color: '#45B7D1' },
-    'ease-in-elastic': { name: 'Ease In Elastic', color: '#FF6B6B' },
-    'ease-out-elastic': { name: 'Ease Out Elastic', color: '#FB5607' },
-    'ease-in-out-elastic': { name: 'Ease In Out Elastic', color: '#FFBE0B' },
-    'ease-in-bounce': { name: 'Ease In Bounce', color: '#F9844A' },
-    'ease-out-bounce': { name: 'Ease Out Bounce', color: '#F8961E' },
-    'ease-in-out-bounce': { name: 'Ease In Out Bounce', color: '#F9C74F' },
+  linear: { name: "Linear", color: "#888888" },
+  "ease-in-quad": { name: "Ease In Quad", color: "#FF6B6B" },
+  "ease-out-quad": { name: "Ease Out Quad", color: "#4ECDC4" },
+  "ease-in-out-quad": { name: "Ease In Out Quad", color: "#45B7D1" },
+  "ease-in-cubic": { name: "Ease In Cubic", color: "#FFBE0B" },
+  "ease-out-cubic": { name: "Ease Out Cubic", color: "#FB5607" },
+  "ease-in-out-cubic": { name: "Ease In Out Cubic", color: "#8338EC" },
+  "ease-in-quart": { name: "Ease In Quart", color: "#3A86FF" },
+  "ease-out-quart": { name: "Ease Out Quart", color: "#FF006E" },
+  "ease-in-out-quart": { name: "Ease In Out Quart", color: "#A5DD9B" },
+  "ease-in-quint": { name: "Ease In Quint", color: "#F9C74F" },
+  "ease-out-quint": { name: "Ease Out Quint", color: "#90BE6D" },
+  "ease-in-out-quint": { name: "Ease In Out Quint", color: "#577590" },
+  "ease-in-sine": { name: "Ease In Sine", color: "#43AA8B" },
+  "ease-out-sine": { name: "Ease Out Sine", color: "#F94144" },
+  "ease-in-out-sine": { name: "Ease In Out Sine", color: "#F3722C" },
+  "ease-in-expo": { name: "Ease In Expo", color: "#F8961E" },
+  "ease-out-expo": { name: "Ease Out Expo", color: "#F9844A" },
+  "ease-in-out-expo": { name: "Ease In Out Expo", color: "#F9C74F" },
+  "ease-in-circ": { name: "Ease In Circ", color: "#90BE6D" },
+  "ease-out-circ": { name: "Ease Out Circ", color: "#43AA8B" },
+  "ease-in-out-circ": { name: "Ease In Out Circ", color: "#577590" },
+  "ease-in-back": { name: "Ease In Back", color: "#A5DD9B" },
+  "ease-out-back": { name: "Ease Out Back", color: "#4ECDC4" },
+  "ease-in-out-back": { name: "Ease In Out Back", color: "#45B7D1" },
+  "ease-in-elastic": { name: "Ease In Elastic", color: "#FF6B6B" },
+  "ease-out-elastic": { name: "Ease Out Elastic", color: "#FB5607" },
+  "ease-in-out-elastic": { name: "Ease In Out Elastic", color: "#FFBE0B" },
+  "ease-in-bounce": { name: "Ease In Bounce", color: "#F9844A" },
+  "ease-out-bounce": { name: "Ease Out Bounce", color: "#F8961E" },
+  "ease-in-out-bounce": { name: "Ease In Out Bounce", color: "#F9C74F" },
 };
+
+// Generate SVG preview for easing functions
+function generateEasingSVG(easingName, width = 100, height = 30) {
+  const easing = easingFunctions[easingName] || easingFunctions.linear;
+  const color = easingMetadata[easingName]?.color || "#888888";
+  const name = easingMetadata[easingName]?.name || easingName;
+
+  const points = [];
+  for (let i = 0; i <= 10; i++) {
+    const t = i / 10;
+    const x = t * (width - 10);
+    const y = height - 10 - easing(t) * (height - 10);
+    points.push(`${x},${y}`);
+  }
+
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${width}" height="${height}" fill="#00000000" stroke="#333" stroke-width="1"/>
+        <polyline points="${points.join(" ")}" fill="none" stroke="${color}" stroke-width="2"/>
+        <text x="5" y="${height - 5}" font-size="8" fill="${color}" font-family="sans-serif">${name}</text>
+    </svg>`;
+}
 
 // === SHADER REGISTRY ===
 const vertexShaderSrc = `
@@ -141,10 +195,10 @@ const vertexShaderSrc = `
 `;
 
 const shaders = {
-    spotlight: {
-        name: 'spotlight',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  spotlight: {
+    name: "spotlight",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform SpotlightParams {
                 vec2 u_mouse;
@@ -162,16 +216,22 @@ const shaders = {
                 gl_FragColor = vec4(u_color, alpha);
             }
         `,
-        uniforms: ['u_mouse', 'u_radius_sq', 'u_color', 'u_falloff', 'u_resolution_inv'],
-        defaultSettings: {
-            radius: 0.2,
-            color: [1.0, 1.0, 1.0],
-        },
+    uniforms: [
+      "u_mouse",
+      "u_radius_sq",
+      "u_color",
+      "u_falloff",
+      "u_resolution_inv",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      color: [1.0, 1.0, 1.0],
     },
-    ripple: {
-        name: 'ripple',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  },
+  ripple: {
+    name: "ripple",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -190,18 +250,26 @@ const shaders = {
                 gl_FragColor = vec4(u_color, alpha);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_time', 'u_radius', 'u_color', 'u_frequency', 'u_amplitude'],
-        defaultSettings: {
-            radius: 0.3,
-            color: [0.0, 0.5, 1.0],
-            frequency: 20.0,
-            amplitude: 0.1,
-        },
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_time",
+      "u_radius",
+      "u_color",
+      "u_frequency",
+      "u_amplitude",
+    ],
+    defaultSettings: {
+      radius: 0.3,
+      color: [0.0, 0.5, 1.0],
+      frequency: 20.0,
+      amplitude: 0.1,
     },
-    scanline: {
-        name: 'scanline',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  },
+  scanline: {
+    name: "scanline",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -225,19 +293,27 @@ const shaders = {
                 gl_FragColor = vec4(u_color * scanline, scanline);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_color', 'u_scanline_width', 'u_horizontal', 'u_density'],
-        defaultSettings: {
-            radius: 0.2,
-            color: [1.0, 1.0, 1.0],
-            scanline_width: 0.01,
-            horizontal: true,
-            density: 100.0,
-        },
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_color",
+      "u_scanline_width",
+      "u_horizontal",
+      "u_density",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      color: [1.0, 1.0, 1.0],
+      scanline_width: 0.01,
+      horizontal: true,
+      density: 100.0,
     },
-    vignette: {
-        name: 'vignette',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  },
+  vignette: {
+    name: "vignette",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -255,19 +331,27 @@ const shaders = {
                 gl_FragColor = vec4(u_color * vignette, vignette);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_color', 'u_strength', 'u_inner_radius', 'u_outer_radius'],
-        defaultSettings: {
-            radius: 0.5,
-            color: [0.0, 0.0, 0.0],
-            strength: 0.8,
-            inner_radius: 0.0,
-            outer_radius: 1.5,
-        },
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_color",
+      "u_strength",
+      "u_inner_radius",
+      "u_outer_radius",
+    ],
+    defaultSettings: {
+      radius: 0.5,
+      color: [0.0, 0.0, 0.0],
+      strength: 0.8,
+      inner_radius: 0.0,
+      outer_radius: 1.5,
     },
-    blur: {
-        name: 'blur',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  },
+  blur: {
+    name: "blur",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -311,20 +395,29 @@ const shaders = {
                 gl_FragColor = vec4(color, 1.0);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_color', 'u_blur_radius', 'u_kernel_size', 'u_iterations', 'u_screen_texture'],
-        defaultSettings: {
-            radius: 0.2,
-            color: [1.0, 1.0, 1.0],
-            blur_radius: 10.0,
-            kernel_size: 3,
-            iterations: 1,
-        },
-        requiresTexture: true,
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_color",
+      "u_blur_radius",
+      "u_kernel_size",
+      "u_iterations",
+      "u_screen_texture",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      color: [1.0, 1.0, 1.0],
+      blur_radius: 10.0,
+      kernel_size: 3,
+      iterations: 1,
     },
-    glow: {
-        name: 'glow',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+    requiresTexture: true,
+  },
+  glow: {
+    name: "glow",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -349,19 +442,28 @@ const shaders = {
                 gl_FragColor = vec4(u_color * glow, glow);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_color', 'u_intensity', 'u_falloff', 'u_pulse_speed', 'u_time'],
-        defaultSettings: {
-            radius: 0.2,
-            color: [1.0, 1.0, 1.0],
-            intensity: 1.0,
-            falloff: 5.0,
-            pulse_speed: 3.0,
-        },
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_color",
+      "u_intensity",
+      "u_falloff",
+      "u_pulse_speed",
+      "u_time",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      color: [1.0, 1.0, 1.0],
+      intensity: 1.0,
+      falloff: 5.0,
+      pulse_speed: 3.0,
     },
-    invert: {
-        name: 'invert',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  },
+  invert: {
+    name: "invert",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -384,17 +486,23 @@ const shaders = {
                 }
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_screen_texture', 'u_invert_alpha'],
-        defaultSettings: {
-            radius: 0.2,
-            invert_alpha: false,
-        },
-        requiresTexture: true,
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_screen_texture",
+      "u_invert_alpha",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      invert_alpha: false,
     },
-    pixelate: {
-        name: 'pixelate',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+    requiresTexture: true,
+  },
+  pixelate: {
+    name: "pixelate",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -420,18 +528,25 @@ const shaders = {
                 gl_FragColor = texture2D(u_screen_texture, pixelated_uv);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_pixel_size', 'u_screen_texture', 'u_pixel_shape'],
-        defaultSettings: {
-            radius: 0.2,
-            pixel_size: 0.05,
-            pixel_shape: 'square',
-        },
-        requiresTexture: true,
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_pixel_size",
+      "u_screen_texture",
+      "u_pixel_shape",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      pixel_size: 0.05,
+      pixel_shape: "square",
     },
-    edge: {
-        name: 'edge',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+    requiresTexture: true,
+  },
+  edge: {
+    name: "edge",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -492,19 +607,27 @@ const shaders = {
                 }
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_screen_texture', 'u_edge_color', 'u_edge_threshold', 'u_kernel_type'],
-        defaultSettings: {
-            radius: 0.2,
-            edge_color: [1.0, 1.0, 1.0],
-            edge_threshold: 0.5,
-            kernel_type: 'sobel',
-        },
-        requiresTexture: true,
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_screen_texture",
+      "u_edge_color",
+      "u_edge_threshold",
+      "u_kernel_type",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      edge_color: [1.0, 1.0, 1.0],
+      edge_threshold: 0.5,
+      kernel_type: "sobel",
     },
-    colorShift: {
-        name: 'colorShift',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+    requiresTexture: true,
+  },
+  colorShift: {
+    name: "colorShift",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -535,19 +658,27 @@ const shaders = {
                 gl_FragColor = vec4(shifted, screen_color.a);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_screen_texture', 'u_hue_shift', 'u_saturation', 'u_brightness'],
-        defaultSettings: {
-            radius: 0.2,
-            hue_shift: 3.14159,
-            saturation: 1.0,
-            brightness: 1.0,
-        },
-        requiresTexture: true,
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_screen_texture",
+      "u_hue_shift",
+      "u_saturation",
+      "u_brightness",
+    ],
+    defaultSettings: {
+      radius: 0.2,
+      hue_shift: 3.14159,
+      saturation: 1.0,
+      brightness: 1.0,
     },
-    grid: {
-        name: 'grid',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+    requiresTexture: true,
+  },
+  grid: {
+    name: "grid",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -573,19 +704,27 @@ const shaders = {
                 gl_FragColor = vec4(u_color * line, line);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_color', 'u_grid_size', 'u_grid_thickness', 'u_snap_to_mouse'],
-        defaultSettings: {
-            radius: 0.3,
-            color: [1.0, 1.0, 1.0],
-            grid_size: 0.1,
-            grid_thickness: 0.005,
-            snap_to_mouse: true,
-        },
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_color",
+      "u_grid_size",
+      "u_grid_thickness",
+      "u_snap_to_mouse",
+    ],
+    defaultSettings: {
+      radius: 0.3,
+      color: [1.0, 1.0, 1.0],
+      grid_size: 0.1,
+      grid_thickness: 0.005,
+      snap_to_mouse: true,
     },
-    neon: {
-        name: 'neon',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  },
+  neon: {
+    name: "neon",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -612,19 +751,28 @@ const shaders = {
                 gl_FragColor = vec4(u_color * glow, glow);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_color', 'u_time', 'u_glow_strength', 'u_pulse_speed', 'u_bloom_radius'],
-        defaultSettings: {
-            radius: 0.3,
-            color: [0.0, 1.0, 1.0],
-            glow_strength: 2.0,
-            pulse_speed: 3.0,
-            bloom_radius: 0.1,
-        },
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_color",
+      "u_time",
+      "u_glow_strength",
+      "u_pulse_speed",
+      "u_bloom_radius",
+    ],
+    defaultSettings: {
+      radius: 0.3,
+      color: [0.0, 1.0, 1.0],
+      glow_strength: 2.0,
+      pulse_speed: 3.0,
+      bloom_radius: 0.1,
     },
-    heatmap: {
-        name: 'heatmap',
-        vertexSrc: vertexShaderSrc,
-        fragmentSrc: `
+  },
+  heatmap: {
+    name: "heatmap",
+    vertexSrc: vertexShaderSrc,
+    fragmentSrc: `
             precision mediump float;
             uniform vec2 u_resolution_inv;
             uniform vec2 u_mouse;
@@ -644,14 +792,21 @@ const shaders = {
                 gl_FragColor = vec4(color, heat);
             }
         `,
-        uniforms: ['u_resolution_inv', 'u_mouse', 'u_radius', 'u_heat_texture', 'u_hot_color', 'u_cold_color'],
-        defaultSettings: {
-            radius: 0.3,
-            hot_color: [1.0, 0.0, 0.0],
-            cold_color: [0.0, 0.0, 1.0],
-        },
-        requiresTexture: true,
+    uniforms: [
+      "u_resolution_inv",
+      "u_mouse",
+      "u_radius",
+      "u_heat_texture",
+      "u_hot_color",
+      "u_cold_color",
+    ],
+    defaultSettings: {
+      radius: 0.3,
+      hot_color: [1.0, 0.0, 0.0],
+      cold_color: [0.0, 0.0, 1.0],
     },
+    requiresTexture: true,
+  },
 };
 
 // === SHADER CACHE ===
@@ -659,24 +814,24 @@ const shaderCache = new Map();
 let resolutionInv = [0, 0];
 
 function getShader(name, vertexSrc, fragmentSrc) {
-    if (!shaderCache.has(name)) {
-        let shader = new Cogl.Shader();
-        shader.set_source(Cogl.ShaderType.VERTEX_SHADER, vertexSrc);
-        shader.set_source(Cogl.ShaderType.FRAGMENT_SHADER, fragmentSrc);
-        if (!shader.compile()) {
-            logError(`Shader "${name}" compilation failed: ${shader.get_info_log()}`);
-            return null;
-        }
-        let pipeline = new Cogl.Pipeline();
-        pipeline.set_shader(shader);
-        shaderCache.set(name, { shader, pipeline });
+  if (!shaderCache.has(name)) {
+    let shader = new Cogl.Shader();
+    shader.set_source(Cogl.ShaderType.VERTEX_SHADER, vertexSrc);
+    shader.set_source(Cogl.ShaderType.FRAGMENT_SHADER, fragmentSrc);
+    if (!shader.compile()) {
+      logError(`Shader "${name}" compilation failed: ${shader.get_info_log()}`);
+      return null;
     }
-    return shaderCache.get(name);
+    let pipeline = new Cogl.Pipeline();
+    pipeline.set_shader(shader);
+    shaderCache.set(name, { shader, pipeline });
+  }
+  return shaderCache.get(name);
 }
 
 // Initialize all shaders
 for (const [name, shaderDef] of Object.entries(shaders)) {
-    getShader(name, shaderDef.vertexSrc, shaderDef.fragmentSrc);
+  getShader(name, shaderDef.vertexSrc, shaderDef.fragmentSrc);
 }
 
 // === GLOBAL STATE ===
@@ -698,388 +853,483 @@ let fadeDuration = 0;
 
 // === SETTINGS ===
 const settings = new Gio.Settings({
-    schema_id: 'org.gnome.shell.extensions.spotlight',
+  schema_id: "org.gnome.shell.extensions.spotlight",
 });
 
 // === TEXTURE MANAGEMENT ===
 function initTextures() {
-    if (!screenTexture) {
-        screenTexture = new Clutter.Texture({
-            width: global.stage_width,
-            height: global.stage_height,
-        });
-        screenTexture.set_content(global.stage);
-    }
+  if (!screenTexture) {
+    screenTexture = new Clutter.Texture({
+      width: global.stage_width,
+      height: global.stage_height,
+    });
+    screenTexture.set_content(global.stage);
+  }
 
-    if (!heatTexture) {
-        heatTexture = new Clutter.Texture({
-            width: global.stage_width,
-            height: global.stage_height,
-        });
-        heatData = new Uint8Array(global.stage_width * global.stage_height * 4);
-        heatTexture.set_data(heatData, Cogl.PixelFormat.RGBA_8888, 0);
-    }
+  if (!heatTexture) {
+    heatTexture = new Clutter.Texture({
+      width: global.stage_width,
+      height: global.stage_height,
+    });
+    heatData = new Uint8Array(global.stage_width * global.stage_height * 4);
+    heatTexture.set_data(heatData, Cogl.PixelFormat.RGBA_8888, 0);
+  }
 }
 
 function updateHeatmap() {
-    if (!heatTexture || currentShaderName !== 'heatmap') return;
+  if (!heatTexture || currentShaderName !== "heatmap") return;
 
-    let [mouseX, mouseY] = global.stage.get_pointer_position();
-    let index = (Math.floor(mouseY) * global.stage_width + Math.floor(mouseX)) * 4;
-    heatData[index] = 255;
-    heatData[index + 1] = 0;
-    heatData[index + 2] = 0;
-    heatData[index + 3] = 255;
+  let [mouseX, mouseY] = global.stage.get_pointer_position();
+  let index =
+    (Math.floor(mouseY) * global.stage_width + Math.floor(mouseX)) * 4;
+  heatData[index] = 255;
+  heatData[index + 1] = 0;
+  heatData[index + 2] = 0;
+  heatData[index + 3] = 255;
 
-    const decayRate = settings.get_double('heatmap-decay-rate');
-    for (let i = 0; i < heatData.length; i += 4) {
-        if (heatData[i] > 0) {
-            heatData[i] = Math.max(0, heatData[i] - decayRate * 255);
-            heatData[i + 3] = Math.max(0, heatData[i + 3] - decayRate * 255);
-        }
+  const decayRate = settings.get_double("heatmap-decay-rate");
+  for (let i = 0; i < heatData.length; i += 4) {
+    if (heatData[i] > 0) {
+      heatData[i] = Math.max(0, heatData[i] - decayRate * 255);
+      heatData[i + 3] = Math.max(0, heatData[i + 3] - decayRate * 255);
     }
+  }
 
-    heatTexture.set_data(heatData, Cogl.PixelFormat.RGBA_8888, 0);
-    return GLib.SOURCE_CONTINUE;
+  heatTexture.set_data(heatData, Cogl.PixelFormat.RGBA_8888, 0);
+  return GLib.SOURCE_CONTINUE;
 }
 
 // === HELPER FUNCTIONS ===
 function updateStaticUniforms() {
-    resolutionInv = [
-        1.0 / global.stage_width,
-        1.0 / global.stage_height
-    ];
+  resolutionInv = [1.0 / global.stage_width, 1.0 / global.stage_height];
 }
 
 function applyShaderEffect() {
-    if (!spotlight) return;
+  if (!spotlight) return;
 
-    const shaderType = settings.get_string('shader-type');
-    if (shaderType === currentShaderName) return;
+  const shaderType = settings.get_string("shader-type");
+  if (shaderType === currentShaderName) return;
 
-    if (currentShaderEffect) {
-        spotlight.remove_effect(currentShaderEffect);
-        currentShaderEffect = null;
+  if (currentShaderEffect) {
+    spotlight.remove_effect(currentShaderEffect);
+    currentShaderEffect = null;
+  }
+
+  const shaderData = shaderCache.get(shaderType);
+  if (!shaderData) {
+    logError(`Shader "${shaderType}" not found!`);
+    return;
+  }
+
+  currentShaderEffect = new Clutter.ShaderEffect({
+    shader: shaderData.shader,
+    pipeline: shaderData.pipeline,
+  });
+  spotlight.add_effect(currentShaderEffect);
+  currentShaderName = shaderType;
+
+  if (shaderData.requiresTexture) {
+    initTextures();
+    if (shaderType === "heatmap") {
+      currentShaderEffect.set_uniform_value("u_heat_texture", heatTexture);
+      if (!heatmapHandlerId) {
+        heatmapHandlerId = GLib.timeout_add(
+          GLib.PRIORITY_DEFAULT,
+          100,
+          updateHeatmap,
+        );
+      }
+    } else {
+      currentShaderEffect.set_uniform_value("u_screen_texture", screenTexture);
     }
+  }
 
-    const shaderData = shaderCache.get(shaderType);
-    if (!shaderData) {
-        logError(`Shader "${shaderType}" not found!`);
-        return;
-    }
-
-    currentShaderEffect = new Clutter.ShaderEffect({
-        shader: shaderData.shader,
-        pipeline: shaderData.pipeline,
-    });
-    spotlight.add_effect(currentShaderEffect);
-    currentShaderName = shaderType;
-
-    if (shaderData.requiresTexture) {
-        initTextures();
-        if (shaderType === 'heatmap') {
-            currentShaderEffect.set_uniform_value('u_heat_texture', heatTexture);
-            if (!heatmapHandlerId) {
-                heatmapHandlerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, updateHeatmap);
-            }
-        } else {
-            currentShaderEffect.set_uniform_value('u_screen_texture', screenTexture);
-        }
-    }
-
-    updateShaderUniforms();
+  updateShaderUniforms();
 }
 
 function updateShaderUniforms() {
-    if (!currentShaderEffect || !currentShaderName) return;
+  if (!currentShaderEffect || !currentShaderName) return;
 
-    const shaderDef = shaders[currentShaderName];
-    if (!shaderDef) return;
+  const shaderDef = shaders[currentShaderName];
+  if (!shaderDef) return;
 
-    const [mouseX, mouseY] = global.stage.get_pointer_position();
-    const normalizedMouse = [
-        mouseX / global.stage_width,
-        mouseY / global.stage_height
-    ];
-    const color = settings.get_value('color').deep_unpack();
-    const radius = settings.get_double('radius');
+  const [mouseX, mouseY] = global.stage.get_pointer_position();
+  const normalizedMouse = [
+    mouseX / global.stage_width,
+    mouseY / global.stage_height,
+  ];
+  const color = settings.get_value("color").deep_unpack();
+  const radius = settings.get_double("radius");
 
-    currentShaderEffect.set_uniform_value('u_resolution_inv', resolutionInv);
-    currentShaderEffect.set_uniform_value('u_mouse', normalizedMouse);
-    currentShaderEffect.set_uniform_value('u_color', color);
+  currentShaderEffect.set_uniform_value("u_resolution_inv", resolutionInv);
+  currentShaderEffect.set_uniform_value("u_mouse", normalizedMouse);
+  currentShaderEffect.set_uniform_value("u_color", color);
 
-    switch (currentShaderName) {
-        case 'spotlight':
-            const radiusSq = radius * radius;
-            currentShaderEffect.set_uniform_value('u_radius_sq', radiusSq);
-            currentShaderEffect.set_uniform_value('u_falloff', radiusSq * falloffFactor);
-            break;
-        case 'ripple':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_time', time);
-            currentShaderEffect.set_uniform_value('u_frequency', settings.get_double('ripple-frequency'));
-            currentShaderEffect.set_uniform_value('u_amplitude', settings.get_double('ripple-amplitude'));
-            break;
-        case 'scanline':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_scanline_width', settings.get_double('scanline-width'));
-            currentShaderEffect.set_uniform_value('u_horizontal', settings.get_boolean('scanline-horizontal'));
-            currentShaderEffect.set_uniform_value('u_density', settings.get_double('scanline-density'));
-            break;
-        case 'vignette':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_strength', settings.get_double('vignette-strength'));
-            currentShaderEffect.set_uniform_value('u_inner_radius', settings.get_double('vignette-inner-radius'));
-            currentShaderEffect.set_uniform_value('u_outer_radius', settings.get_double('vignette-outer-radius'));
-            break;
-        case 'blur':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_blur_radius', settings.get_double('blur-radius'));
-            currentShaderEffect.set_uniform_value('u_kernel_size', settings.get_int('blur-kernel-size'));
-            currentShaderEffect.set_uniform_value('u_iterations', settings.get_int('blur-iterations'));
-            break;
-        case 'glow':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_intensity', settings.get_double('glow-intensity'));
-            currentShaderEffect.set_uniform_value('u_falloff', settings.get_double('glow-falloff'));
-            currentShaderEffect.set_uniform_value('u_pulse_speed', settings.get_double('glow-pulse-speed'));
-            break;
-        case 'invert':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_invert_alpha', settings.get_boolean('invert-alpha'));
-            break;
-        case 'pixelate':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_pixel_size', settings.get_double('pixel-size'));
-            currentShaderEffect.set_uniform_value('u_pixel_shape', settings.get_string('pixel-shape') === 'circle' ? 1 : 0);
-            break;
-        case 'edge':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_edge_color', settings.get_value('edge-color').deep_unpack());
-            currentShaderEffect.set_uniform_value('u_edge_threshold', settings.get_double('edge-threshold'));
-            const kernelType = settings.get_string('edge-kernel');
-            let kernelId = 0;
-            if (kernelType === 'prewitt') kernelId = 1;
-            else if (kernelType === 'laplacian') kernelId = 2;
-            currentShaderEffect.set_uniform_value('u_kernel_type', kernelId);
-            break;
-        case 'colorShift':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_hue_shift', settings.get_double('hue-shift'));
-            currentShaderEffect.set_uniform_value('u_saturation', settings.get_double('saturation'));
-            currentShaderEffect.set_uniform_value('u_brightness', settings.get_double('brightness'));
-            break;
-        case 'grid':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_grid_size', settings.get_double('grid-size'));
-            currentShaderEffect.set_uniform_value('u_grid_thickness', settings.get_double('grid-thickness'));
-            currentShaderEffect.set_uniform_value('u_snap_to_mouse', settings.get_boolean('grid-snap-to-mouse'));
-            break;
-        case 'neon':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_glow_strength', settings.get_double('neon-glow-strength'));
-            currentShaderEffect.set_uniform_value('u_pulse_speed', settings.get_double('neon-pulse-speed'));
-            currentShaderEffect.set_uniform_value('u_bloom_radius', settings.get_double('neon-bloom-radius'));
-            break;
-        case 'heatmap':
-            currentShaderEffect.set_uniform_value('u_radius', radius);
-            currentShaderEffect.set_uniform_value('u_hot_color', settings.get_value('heatmap-hot-color').deep_unpack());
-            currentShaderEffect.set_uniform_value('u_cold_color', settings.get_value('heatmap-cold-color').deep_unpack());
-            break;
-    }
+  switch (currentShaderName) {
+    case "spotlight":
+      const radiusSq = radius * radius;
+      currentShaderEffect.set_uniform_value("u_radius_sq", radiusSq);
+      currentShaderEffect.set_uniform_value(
+        "u_falloff",
+        radiusSq * falloffFactor,
+      );
+      break;
+    case "ripple":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value("u_time", time);
+      currentShaderEffect.set_uniform_value(
+        "u_frequency",
+        settings.get_double("ripple-frequency"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_amplitude",
+        settings.get_double("ripple-amplitude"),
+      );
+      break;
+    case "scanline":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_scanline_width",
+        settings.get_double("scanline-width"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_horizontal",
+        settings.get_boolean("scanline-horizontal"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_density",
+        settings.get_double("scanline-density"),
+      );
+      break;
+    case "vignette":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_strength",
+        settings.get_double("vignette-strength"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_inner_radius",
+        settings.get_double("vignette-inner-radius"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_outer_radius",
+        settings.get_double("vignette-outer-radius"),
+      );
+      break;
+    case "blur":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_blur_radius",
+        settings.get_double("blur-radius"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_kernel_size",
+        settings.get_int("blur-kernel-size"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_iterations",
+        settings.get_int("blur-iterations"),
+      );
+      break;
+    case "glow":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_intensity",
+        settings.get_double("glow-intensity"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_falloff",
+        settings.get_double("glow-falloff"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_pulse_speed",
+        settings.get_double("glow-pulse-speed"),
+      );
+      break;
+    case "invert":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_invert_alpha",
+        settings.get_boolean("invert-alpha"),
+      );
+      break;
+    case "pixelate":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_pixel_size",
+        settings.get_double("pixel-size"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_pixel_shape",
+        settings.get_string("pixel-shape") === "circle" ? 1 : 0,
+      );
+      break;
+    case "edge":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_edge_color",
+        settings.get_value("edge-color").deep_unpack(),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_edge_threshold",
+        settings.get_double("edge-threshold"),
+      );
+      const kernelType = settings.get_string("edge-kernel");
+      let kernelId = 0;
+      if (kernelType === "prewitt") kernelId = 1;
+      else if (kernelType === "laplacian") kernelId = 2;
+      currentShaderEffect.set_uniform_value("u_kernel_type", kernelId);
+      break;
+    case "colorShift":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_hue_shift",
+        settings.get_double("hue-shift"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_saturation",
+        settings.get_double("saturation"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_brightness",
+        settings.get_double("brightness"),
+      );
+      break;
+    case "grid":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_grid_size",
+        settings.get_double("grid-size"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_grid_thickness",
+        settings.get_double("grid-thickness"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_snap_to_mouse",
+        settings.get_boolean("grid-snap-to-mouse"),
+      );
+      break;
+    case "neon":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_glow_strength",
+        settings.get_double("neon-glow-strength"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_pulse_speed",
+        settings.get_double("neon-pulse-speed"),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_bloom_radius",
+        settings.get_double("neon-bloom-radius"),
+      );
+      break;
+    case "heatmap":
+      currentShaderEffect.set_uniform_value("u_radius", radius);
+      currentShaderEffect.set_uniform_value(
+        "u_hot_color",
+        settings.get_value("heatmap-hot-color").deep_unpack(),
+      );
+      currentShaderEffect.set_uniform_value(
+        "u_cold_color",
+        settings.get_value("heatmap-cold-color").deep_unpack(),
+      );
+      break;
+  }
 }
 
 function startTimeAnimation() {
-    if (timeHandlerId) {
-        GLib.source_remove(timeHandlerId);
+  if (timeHandlerId) {
+    GLib.source_remove(timeHandlerId);
+  }
+  time = 0;
+  const rippleSpeed = settings.get_double("ripple-speed");
+  timeHandlerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+    time += 0.016 * rippleSpeed;
+    if (currentShaderName === "ripple" || currentShaderName === "neon") {
+      updateShaderUniforms();
     }
-    time = 0;
-    const rippleSpeed = settings.get_double('ripple-speed');
-    timeHandlerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
-        time += 0.016 * rippleSpeed;
-        if (currentShaderName === 'ripple' || currentShaderName === 'neon') {
-            updateShaderUniforms();
-        }
-        return GLib.SOURCE_CONTINUE;
-    });
+    return GLib.SOURCE_CONTINUE;
+  });
 }
 
 // === FADE ANIMATION WITH EASING ===
 function startFadeOut() {
-    if (fadeOutId) GLib.source_remove(fadeOutId);
-    if (fadeInId) GLib.source_remove(fadeInId);
-    isFadingIn = false;
-    isFadingOut = true;
-    fadeStartTime = Date.now();
-    fadeDuration = settings.get_int('fade-delay');
+  if (fadeOutId) GLib.source_remove(fadeOutId);
+  if (fadeInId) GLib.source_remove(fadeInId);
+  isFadingIn = false;
+  isFadingOut = true;
+  fadeStartTime = Date.now();
+  fadeDuration = settings.get_int("fade-delay");
 
-    const easing = settings.get_string('fade-easing');
+  const easing = settings.get_string("fade-easing");
 
-    fadeOutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
-        const elapsed = Date.now() - fadeStartTime;
-        const progress = Math.min(elapsed / fadeDuration, 1.0);
-        const easedProgress = applyEasing(progress, easing);
-        spotlight.opacity = 255 * (1 - easedProgress);
+  fadeOutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+    const elapsed = Date.now() - fadeStartTime;
+    const progress = Math.min(elapsed / fadeDuration, 1.0);
+    const easedProgress = applyEasing(progress, easing);
+    spotlight.opacity = 255 * (1 - easedProgress);
 
-        if (progress >= 1.0) {
-            isFadingOut = false;
-            return GLib.SOURCE_REMOVE;
-        }
-        return GLib.SOURCE_CONTINUE;
-    });
+    if (progress >= 1.0) {
+      isFadingOut = false;
+      return GLib.SOURCE_REMOVE;
+    }
+    return GLib.SOURCE_CONTINUE;
+  });
 }
 
 function startFadeIn() {
-    if (fadeInId) GLib.source_remove(fadeInId);
-    if (fadeOutId) GLib.source_remove(fadeOutId);
-    isFadingIn = true;
-    isFadingOut = false;
-    fadeStartTime = Date.now();
-    fadeDuration = settings.get_int('fade-delay');
+  if (fadeInId) GLib.source_remove(fadeInId);
+  if (fadeOutId) GLib.source_remove(fadeOutId);
+  isFadingIn = true;
+  isFadingOut = false;
+  fadeStartTime = Date.now();
+  fadeDuration = settings.get_int("fade-delay");
 
-    const easing = settings.get_string('fade-easing');
+  const easing = settings.get_string("fade-easing");
 
-    fadeInId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
-        const elapsed = Date.now() - fadeStartTime;
-        const progress = Math.min(elapsed / fadeDuration, 1.0);
-        const easedProgress = applyEasing(progress, easing);
-        const targetOpacity = settings.get_double('opacity');
-        spotlight.opacity = 255 * targetOpacity * easedProgress;
+  fadeInId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
+    const elapsed = Date.now() - fadeStartTime;
+    const progress = Math.min(elapsed / fadeDuration, 1.0);
+    const easedProgress = applyEasing(progress, easing);
+    const targetOpacity = settings.get_double("opacity");
+    spotlight.opacity = 255 * targetOpacity * easedProgress;
 
-        if (progress >= 1.0) {
-            isFadingIn = false;
-            return GLib.SOURCE_REMOVE;
-        }
-        return GLib.SOURCE_CONTINUE;
-    });
+    if (progress >= 1.0) {
+      isFadingIn = false;
+      return GLib.SOURCE_REMOVE;
+    }
+    return GLib.SOURCE_CONTINUE;
+  });
 }
 
 function resetFadeTimers() {
-    if (fadeOutId) {
-        GLib.source_remove(fadeOutId);
-        fadeOutId = null;
-    }
-    if (fadeInId) {
-        GLib.source_remove(fadeInId);
-        fadeInId = null;
-    }
-    isFadingIn = false;
-    isFadingOut = false;
+  if (fadeOutId) {
+    GLib.source_remove(fadeOutId);
+    fadeOutId = null;
+  }
+  if (fadeInId) {
+    GLib.source_remove(fadeInId);
+    fadeInId = null;
+  }
+  isFadingIn = false;
+  isFadingOut = false;
 }
 
 // Dev-only: Reload shaders
 function reloadShaders() {
-    shaderCache.clear();
-    for (const [name, shaderDef] of Object.entries(shaders)) {
-        getShader(name, shaderDef.vertexSrc, shaderDef.fragmentSrc);
-    }
-    if (currentShaderName) {
-        applyShaderEffect();
-    }
+  shaderCache.clear();
+  for (const [name, shaderDef] of Object.entries(shaders)) {
+    getShader(name, shaderDef.vertexSrc, shaderDef.fragmentSrc);
+  }
+  if (currentShaderName) {
+    applyShaderEffect();
+  }
 }
 
 if (DEV_MODE) {
-    global.reloadShaders = reloadShaders;
+  global.reloadShaders = reloadShaders;
 }
 
 // === EXTENSION LIFECYCLE ===
 function enable() {
-    updateStaticUniforms();
-    initTextures();
+  updateStaticUniforms();
+  initTextures();
 
-    spotlight = new Clutter.Actor({
-        width: global.stage_width,
-        height: global.stage_height,
-        opacity: 0,
-        reactive: false,
-    });
-    global.stage.add_actor(spotlight);
+  spotlight = new Clutter.Actor({
+    width: global.stage_width,
+    height: global.stage_height,
+    opacity: 0,
+    reactive: false,
+  });
+  global.stage.add_actor(spotlight);
 
-    applyShaderEffect();
-    startTimeAnimation();
+  applyShaderEffect();
+  startTimeAnimation();
 
-    const motionHandlerId = global.stage.connect('motion-event', () => {
-        if (!isFadingIn) {
-            resetFadeTimers();
-            spotlight.opacity = 255 * settings.get_double('opacity');
-            startFadeOut();
-        }
-    });
+  const motionHandlerId = global.stage.connect("motion-event", () => {
+    if (!isFadingIn) {
+      resetFadeTimers();
+      spotlight.opacity = 255 * settings.get_double("opacity");
+      startFadeOut();
+    }
+  });
 
-    // Start initial fade-in
-    startFadeIn();
+  // Start initial fade-in
+  startFadeIn();
 
-    settings.connect('changed::shader-type', applyShaderEffect);
-    settings.connect('changed::radius', updateShaderUniforms);
-    settings.connect('changed::color', updateShaderUniforms);
-    settings.connect('changed::opacity', updateShaderUniforms);
-    settings.connect('changed::fade-delay', () => {
-        resetFadeTimers();
-        startFadeOut();
-    });
-    settings.connect('changed::fade-easing', () => {
-        resetFadeTimers();
-        if (isFadingOut) startFadeOut();
-        else if (isFadingIn) startFadeIn();
-    });
-    settings.connect('changed::ripple-speed', startTimeAnimation);
-    settings.connect('changed::ripple-frequency', updateShaderUniforms);
-    settings.connect('changed::ripple-amplitude', updateShaderUniforms);
-    settings.connect('changed::scanline-width', updateShaderUniforms);
-    settings.connect('changed::scanline-horizontal', updateShaderUniforms);
-    settings.connect('changed::scanline-density', updateShaderUniforms);
-    settings.connect('changed::vignette-strength', updateShaderUniforms);
-    settings.connect('changed::vignette-inner-radius', updateShaderUniforms);
-    settings.connect('changed::vignette-outer-radius', updateShaderUniforms);
-    settings.connect('changed::blur-radius', updateShaderUniforms);
-    settings.connect('changed::blur-kernel-size', updateShaderUniforms);
-    settings.connect('changed::blur-iterations', updateShaderUniforms);
-    settings.connect('changed::glow-intensity', updateShaderUniforms);
-    settings.connect('changed::glow-falloff', updateShaderUniforms);
-    settings.connect('changed::glow-pulse-speed', updateShaderUniforms);
-    settings.connect('changed::invert-alpha', updateShaderUniforms);
-    settings.connect('changed::pixel-size', updateShaderUniforms);
-    settings.connect('changed::pixel-shape', updateShaderUniforms);
-    settings.connect('changed::edge-color', updateShaderUniforms);
-    settings.connect('changed::edge-threshold', updateShaderUniforms);
-    settings.connect('changed::edge-kernel', updateShaderUniforms);
-    settings.connect('changed::hue-shift', updateShaderUniforms);
-    settings.connect('changed::saturation', updateShaderUniforms);
-    settings.connect('changed::brightness', updateShaderUniforms);
-    settings.connect('changed::grid-size', updateShaderUniforms);
-    settings.connect('changed::grid-thickness', updateShaderUniforms);
-    settings.connect('changed::grid-color', updateShaderUniforms);
-    settings.connect('changed::grid-snap-to-mouse', updateShaderUniforms);
-    settings.connect('changed::neon-glow-strength', updateShaderUniforms);
-    settings.connect('changed::neon-pulse-speed', updateShaderUniforms);
-    settings.connect('changed::neon-color', updateShaderUniforms);
-    settings.connect('changed::neon-bloom-radius', updateShaderUniforms);
-    settings.connect('changed::heatmap-hot-color', updateShaderUniforms);
-    settings.connect('changed::heatmap-cold-color', updateShaderUniforms);
-    settings.connect('changed::heatmap-decay-rate', updateShaderUniforms);
-    settings.connect('changed::heatmap-point-size', updateShaderUniforms);
+  settings.connect("changed::shader-type", applyShaderEffect);
+  settings.connect("changed::radius", updateShaderUniforms);
+  settings.connect("changed::color", updateShaderUniforms);
+  settings.connect("changed::opacity", updateShaderUniforms);
+  settings.connect("changed::fade-delay", () => {
+    resetFadeTimers();
+    startFadeOut();
+  });
+  settings.connect("changed::fade-easing", () => {
+    resetFadeTimers();
+    if (isFadingOut) startFadeOut();
+    else if (isFadingIn) startFadeIn();
+  });
+  settings.connect("changed::ripple-speed", startTimeAnimation);
+  settings.connect("changed::ripple-frequency", updateShaderUniforms);
+  settings.connect("changed::ripple-amplitude", updateShaderUniforms);
+  settings.connect("changed::scanline-width", updateShaderUniforms);
+  settings.connect("changed::scanline-horizontal", updateShaderUniforms);
+  settings.connect("changed::scanline-density", updateShaderUniforms);
+  settings.connect("changed::vignette-strength", updateShaderUniforms);
+  settings.connect("changed::vignette-inner-radius", updateShaderUniforms);
+  settings.connect("changed::vignette-outer-radius", updateShaderUniforms);
+  settings.connect("changed::blur-radius", updateShaderUniforms);
+  settings.connect("changed::blur-kernel-size", updateShaderUniforms);
+  settings.connect("changed::blur-iterations", updateShaderUniforms);
+  settings.connect("changed::glow-intensity", updateShaderUniforms);
+  settings.connect("changed::glow-falloff", updateShaderUniforms);
+  settings.connect("changed::glow-pulse-speed", updateShaderUniforms);
+  settings.connect("changed::invert-alpha", updateShaderUniforms);
+  settings.connect("changed::pixel-size", updateShaderUniforms);
+  settings.connect("changed::pixel-shape", updateShaderUniforms);
+  settings.connect("changed::edge-color", updateShaderUniforms);
+  settings.connect("changed::edge-threshold", updateShaderUniforms);
+  settings.connect("changed::edge-kernel", updateShaderUniforms);
+  settings.connect("changed::hue-shift", updateShaderUniforms);
+  settings.connect("changed::saturation", updateShaderUniforms);
+  settings.connect("changed::brightness", updateShaderUniforms);
+  settings.connect("changed::grid-size", updateShaderUniforms);
+  settings.connect("changed::grid-thickness", updateShaderUniforms);
+  settings.connect("changed::grid-color", updateShaderUniforms);
+  settings.connect("changed::grid-snap-to-mouse", updateShaderUniforms);
+  settings.connect("changed::neon-glow-strength", updateShaderUniforms);
+  settings.connect("changed::neon-pulse-speed", updateShaderUniforms);
+  settings.connect("changed::neon-color", updateShaderUniforms);
+  settings.connect("changed::neon-bloom-radius", updateShaderUniforms);
+  settings.connect("changed::heatmap-hot-color", updateShaderUniforms);
+  settings.connect("changed::heatmap-cold-color", updateShaderUniforms);
+  settings.connect("changed::heatmap-decay-rate", updateShaderUniforms);
+  settings.connect("changed::heatmap-point-size", updateShaderUniforms);
 }
 
 function disable() {
-    if (timeHandlerId) {
-        GLib.source_remove(timeHandlerId);
-        timeHandlerId = null;
-    }
-    if (heatmapHandlerId) {
-        GLib.source_remove(heatmapHandlerId);
-        heatmapHandlerId = null;
-    }
-    resetFadeTimers();
+  if (timeHandlerId) {
+    GLib.source_remove(timeHandlerId);
+    timeHandlerId = null;
+  }
+  if (heatmapHandlerId) {
+    GLib.source_remove(heatmapHandlerId);
+    heatmapHandlerId = null;
+  }
+  resetFadeTimers();
 
-    if (spotlight) {
-        global.stage.remove_actor(spotlight);
-        spotlight = null;
-    }
+  if (spotlight) {
+    global.stage.remove_actor(spotlight);
+    spotlight = null;
+  }
 
-    currentShaderEffect = null;
-    currentShaderName = null;
+  currentShaderEffect = null;
+  currentShaderName = null;
 }
 
 function init() {
-    // Nothing to do here
+  // Nothing to do here
 }
